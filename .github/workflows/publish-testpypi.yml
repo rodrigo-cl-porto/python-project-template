@@ -1,0 +1,67 @@
+name: Publish to TestPyPI
+
+on:
+  push:
+    branches:
+      - main  # Triggers the workflow when pushing code to the main branch
+  workflow_dispatch: # Allows you to manually trigger this workflow from the GitHub UI
+
+jobs:
+  build:
+    name: Build distribution packages
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read # Required to checkout code
+
+    steps:
+      - name: Copy the Repo to Virtual Server
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: | # Copy only the necessary folders and files to virtual machine.
+            src
+            .python-version
+            LICENSE.md
+            pyproject.toml
+            README.md
+            uv.lock
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Build distribution packages
+        run: uv build --no-sources
+
+      - name: Upload Windows dists
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dists
+          path: dist/
+
+  publish-testpypi:
+    name: Publish to TestPyPI via OIDC
+    needs: build
+    runs-on: ubuntu-latest
+    
+    permissions:
+      id-token: write # Required for GitHub OIDC Trusted Publishing authentication
+
+    # Matches the environment name configured on TestPyPI
+    environment:
+      name: testpypi # Create beforehand a environment on your GitHub repo with this name.
+      url: https://pypi.org
+
+    steps:
+      - name: Retrieve release distributions
+        uses: actions/download-artifact@v5
+        with:
+          name: release-dists
+          path: dist/
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/

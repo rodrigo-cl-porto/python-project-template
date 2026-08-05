@@ -1,0 +1,63 @@
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published] # Triggers when a release is created on GitHub
+  workflow_dispatch: # Allows you to manually trigger this workflow from the GitHub UI
+
+jobs:
+  build:
+    name: Build the Python Package with uv
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read # Required to checkout code
+
+    steps:
+      - name: Copy the Repo to Virtual Server
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: | # Copy only the necessary folders and files to virtual machine.
+            src
+            .python-version
+            LICENSE.md
+            pyproject.toml
+            README.md
+            uv.lock
+
+      - name: install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Build distribution packages
+        run: uv build --no-sources
+
+      - name: Upload Windows dists
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dists
+          path: dist/
+
+  publish-pypi:
+    name: Publish the Python Package to PyPI via OIDC
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write # Required to get OIDC working.
+
+    environment:
+      name: pypi # Create beforehand a environment on your GitHub repo with this name.
+      url: https://pypi.org
+
+    steps:
+      - name: Retrieve release distributions
+        uses: actions/download-artifact@v5
+        with:
+          name: release-dists
+          path: dist/
+
+      - name: publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

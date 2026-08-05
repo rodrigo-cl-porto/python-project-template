@@ -1,0 +1,179 @@
+[project]
+name = "my-project"
+version = "0.1.0"
+description = "Add your description here."
+keywords = ["Python Project Template", "Template", "My Awesome Project", "Awesome"]
+readme = "README.md"
+license = { file = "LICENSE.md" }
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.13",
+    "Framework :: Pytest",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Version Control :: Git",
+    "Typing :: Typed"
+]
+authors = [
+    { name = "John Doe", email = "john.doe@mail.com" }
+]
+requires-python = ">=3.13"
+dependencies = []
+
+[project.urls]
+"Source Code" = "https://github.com/john-doe/my-project"
+"Documentation" = "https://my-project.readthedocs.io/"
+"LinkedIn Profile" = "https://www.linkedin.com/in/john-doe/"
+"GitHub Profile" = "https://github.com/john-doe"
+
+[project.markdown_extensions]
+mkdocstrings = { handler = "python" }
+
+[build-system]
+requires = ["uv_build>=0.12.1,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "poethepoet>=0.48.0",
+    "pytest>=9.1.1",
+    "ruff>=0.16.1",
+]
+docs = [
+    "mkdocstrings>=1.0.6",
+    "zensical>=0.0.53",
+]
+
+
+[tool.ruff] # https://docs.astral.sh/ruff/
+line-length = 120
+target-version = "py313"
+fix = true
+show-fixes = true
+indent-width = 4
+exclude = ["venv", ".venv", "env", ".env", "node_modules", "__pycache__", "tests"]
+
+[tool.ruff.lint]
+exclude = ["*.ipynb"]
+select = [
+    "ASYNC",
+    "A",
+    "ANN",
+    "B",
+    "BLE",
+    "C4",
+    "C90",
+    "COM",
+    "E",
+    "EM",
+    "ERA",
+    "EXE",
+    "F",
+    "FBT",
+    "FIX",
+    "I",
+    "ICN",
+    "ISC",
+    "Q",
+    "RET",
+    "RSE",
+    "S",
+    "SIM",
+    "SLF",
+    "T10",
+    "T20",
+    "TC",
+    "TD",
+    "TRY",
+    "UP",
+    "W",
+    "YTT",
+    "RUF",
+    "N",
+]
+ignore = [
+    "T201",
+    "T203", # p-print
+    "N806", # non-lowercase-variable-in-function
+    "FBT001", # Boolean-typed positional argument in function definition
+    "FBT002", # Boolean-typed positional argument in function definition
+    "COM812",
+    "I001",
+    "E741",
+    "RUF001", # ambiguous-unicode-character-string
+    "RUF002", # ambiguous-unicode-character-docstring
+    "W293"
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["ANN201", "S101"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+
+[tool.pytest.ini_options]
+addopts = "-s --color=yes --tb=short"
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+
+[tool.poe] # https://poethepoet.natn.io/index.html
+executor = "uv"
+verbosity = -1  # The quietest level of verbosity.
+
+[tool.poe.tasks.clean]
+help = "Remove all unnecessary files and folders (except .venv)."
+shell = """
+    rm -rf dist &
+    rm -rf .pytest_cache &
+    rm -rf .ruff_cache &
+    rm -rf docs/_build &
+    rm -rf book/_build
+"""
+
+[tool.poe.tasks.clean-venv]
+help = "Remove all unnecessary files and folders (including the .venv)."
+deps = ["clean"]
+cmd = "rm -rf .venv"
+
+[tool.poe.tasks.sync]
+help = "Install all the project dependencies."
+cmd = "uv sync --all-groups"
+
+[tool.poe.tasks.docs]
+help = "Serve the documentation site."
+cmd = "zensical serve"
+
+[tool.poe.tasks.book]
+help = "Serve the Jupyter Book site."
+cmd = "jupyter-book start"
+cwd = "book"
+env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" }
+
+[tool.poe.tasks.test]
+help = "Run all the automatic tests."
+cmd = "pytest --maxfail=1"
+cwd = "tests"
+
+[tool.poe.tasks.lint]
+help = "Lint the code using Ruff linter."
+cmd = "ruff check"
+
+[tool.poe.tasks.build]
+help = "Build the Python package to dist folder."
+shell = """
+    rm -rf dist &
+    uv build --no-sources
+"""
+
+[tool.poe.tasks.publish]
+help = "Publish the built package to PyPI (Python Package Index) site."
+cmd = "uv publish --system-certs"
+envfile=".env"
+
+[tool.poe.tasks.deploy]
+help = "Lint and test the code before building and publishing the Python package to PyPI."
+sequence = ["lint", "test", "build", "publish"]
