@@ -1,13 +1,13 @@
 [project] # https://zensical.org/docs/get-started/
 site_name = "My Awesome Project"
-site_url = "https://linkedin-games-linopt-solvers.readthedocs.io/"
+site_url = "https://my-awesome-project.readthedocs.io/"
 site_description = "Documentation site for My Awesome Python package."
 site_author = "John Doe"
 copyright = "Copyright &copy; <span id='year-copyright'></span> John Doe"
 docs_dir = "docs"
 site_dir = "docs/_build"
 dev_addr = "localhost:3000"
-repo_url = "https://github.com/john-doe/LinkedIn-Games-LinOpt-Solvers"
+repo_url = "https://github.com/john-doe/my-awesome-project"
 nav = []
 
 [project.theme]

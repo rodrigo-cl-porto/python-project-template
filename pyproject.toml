@@ -1,5 +1,5 @@
 [project]
-name = "my-project"
+name = "my-awesome-project"
 version = "0.1.0"
 description = "Add your description here."
 keywords = ["Python Project Template", "Template", "My Awesome Project", "Awesome"]
@@ -21,8 +21,8 @@ requires-python = ">=3.13"
 dependencies = []
 
 [project.urls]
-"Source Code" = "https://github.com/john-doe/my-project"
-"Documentation" = "https://my-project.readthedocs.io/"
+"Source Code" = "https://github.com/john-doe/my-awesome-project"
+"Documentation" = "https://my-awesome-project.readthedocs.io/"
 "LinkedIn Profile" = "https://www.linkedin.com/in/john-doe/"
 "GitHub Profile" = "https://github.com/john-doe"
 
@@ -45,13 +45,22 @@ docs = [
 ]
 
 
+# Package Manager
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
+
+
+# Linting
 [tool.ruff] # https://docs.astral.sh/ruff/
 line-length = 120
 target-version = "py313"
 fix = true
 show-fixes = true
 indent-width = 4
-exclude = ["venv", ".venv", "env", ".env", "node_modules", "__pycache__", "tests"]
+exclude = [".venv", ".env", "__pycache__", "tests"]
 
 [tool.ruff.lint]
 exclude = ["*.ipynb"]
@@ -114,12 +123,14 @@ indent-style = "space"
 line-ending = "lf"
 
 
+# Automatic Tests
 [tool.pytest.ini_options]
 addopts = "-s --color=yes --tb=short"
 pythonpath = ["src"]
 testpaths = ["tests"]
 
 
+# Task Runner
 [tool.poe] # https://poethepoet.natn.io/index.html
 executor = "uv"
 verbosity = -1  # The quietest level of verbosity.
@@ -130,14 +141,8 @@ shell = """
     rm -rf dist &
     rm -rf .pytest_cache &
     rm -rf .ruff_cache &
-    rm -rf docs/_build &
-    rm -rf book/_build
+    rm -rf docs/_build
 """
-
-[tool.poe.tasks.clean-venv]
-help = "Remove all unnecessary files and folders (including the .venv)."
-deps = ["clean"]
-cmd = "rm -rf .venv"
 
 [tool.poe.tasks.sync]
 help = "Install all the project dependencies."
@@ -146,12 +151,6 @@ cmd = "uv sync --all-groups"
 [tool.poe.tasks.docs]
 help = "Serve the documentation site."
 cmd = "zensical serve"
-
-[tool.poe.tasks.book]
-help = "Serve the Jupyter Book site."
-cmd = "jupyter-book start"
-cwd = "book"
-env = { NODE_TLS_REJECT_UNAUTHORIZED = "0" }
 
 [tool.poe.tasks.test]
 help = "Run all the automatic tests."
@@ -169,8 +168,17 @@ shell = """
     uv build --no-sources
 """
 
+[tool.poe.tasks.test-publish]
+help = "Publish the built package to TestPyPI via token"
+cmd = "uv publish --system-certs --index testpypi --token $UV_TEST_PUBLISH_TOKEN"
+envfile=".env"
+
+[tool.poe.tasks.test-deploy]
+help = "Lint and test the code before building and publishing the Python package to TestPyPI."
+sequence = ["lint", "test", "build", "test-publish"]
+
 [tool.poe.tasks.publish]
-help = "Publish the built package to PyPI (Python Package Index) site."
+help = "Publish the built package to PyPI via token."
 cmd = "uv publish --system-certs"
 envfile=".env"
 
