@@ -38,6 +38,7 @@ dev = [
     "poethepoet>=0.48.0",
     "pytest>=9.1.1",
     "ruff>=0.16.1",
+    "ty>=0.0.69",
 ]
 docs = [
     "mkdocstrings>=1.0.6",
@@ -121,6 +122,15 @@ ignore = [
 quote-style = "double"
 indent-style = "space"
 line-ending = "lf"
+
+
+[tool.ty.environment] # https://docs.astral.sh/ty
+root = ["./src"]
+
+[tool.ty.rules]
+unsupported-operator = "ignore"
+not-iterable = "warn"
+invalid-method-override = "warn"
 
 
 # Automatic Tests
