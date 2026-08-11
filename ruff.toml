@@ -1,0 +1,69 @@
+# Linting / Formatter: [Ruff](https://docs.astral.sh/ruff/)
+
+line-length = 120
+target-version = "py313"
+fix = true
+show-fixes = true
+indent-width = 4
+exclude = [".venv", ".env", "__pycache__", "tests"]
+
+[lint]
+exclude = ["*.ipynb"]
+select = [
+    "ASYNC",
+    "A",
+    "ANN",
+    "B",
+    "BLE",
+    "C4",
+    "C90",
+    "COM",
+    "E",
+    "EM",
+    "ERA",
+    "EXE",
+    "F",
+    "FBT",
+    "FIX",
+    "I",
+    "ICN",
+    "ISC",
+    "Q",
+    "RET",
+    "RSE",
+    "S",
+    "SIM",
+    "SLF",
+    "T10",
+    "T20",
+    "TC",
+    "TD",
+    "TRY",
+    "UP",
+    "W",
+    "YTT",
+    "RUF",
+    "N",
+]
+ignore = [
+    "T201",
+    "T203", # p-print
+    "N806", # non-lowercase-variable-in-function
+    "FBT001", # Boolean-typed positional argument in function definition
+    "FBT002", # Boolean-typed positional argument in function definition
+    "COM812",
+    "I001",
+    "E741",
+    "RUF001", # ambiguous-unicode-character-string
+    "RUF002", # ambiguous-unicode-character-docstring
+    "S311", # suspicious-non-cryptographic-random-usage
+    "W293"
+]
+
+[lint.per-file-ignores]
+"tests/**/*.py" = ["ANN201", "S101"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"

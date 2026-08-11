@@ -1,0 +1,10 @@
+# Type Checker: [Ty](https://docs.astral.sh/ty)
+
+[environment]
+root = ["./src"]
+
+[rules]
+unsupported-operator = "ignore"
+not-iterable = "warn"
+invalid-method-override = "warn"
+not-subscriptable = "warn"

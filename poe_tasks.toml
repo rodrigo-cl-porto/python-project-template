@@ -1,0 +1,55 @@
+# Task Runner: [Poe the Port](https://poethepoet.natn.io/index.html)
+
+executor = "uv"
+verbosity = -1  # The quietest level of verbosity.
+
+[tasks.clean]
+help = "Remove all unnecessary files and folders (except .venv)."
+shell = """
+    rm -rf dist &
+    rm -rf .pytest_cache &
+    rm -rf .ruff_cache &
+    rm -rf docs/_build
+"""
+
+[tasks.sync]
+help = "Install all the project dependencies."
+cmd = "uv sync --all-groups"
+
+[tasks.docs]
+help = "Serve the documentation site."
+cmd = "zensical serve"
+
+[tasks.test]
+help = "Run all the automatic tests."
+cmd = "pytest --maxfail=1"
+cwd = "tests"
+
+[tasks.lint]
+help = "Lint the code using Ruff linter."
+cmd = "ruff check"
+
+[tasks.build]
+help = "Build the Python package to dist folder."
+shell = """
+    rm -rf dist &
+    uv build --no-sources
+"""
+
+[tasks.test-publish]
+help = "Publish the built package to TestPyPI via token"
+cmd = "uv publish --system-certs --index testpypi --token $UV_TEST_PUBLISH_TOKEN"
+envfile=".env"
+
+[tasks.test-deploy]
+help = "Lint and test the code before building and publishing the Python package to TestPyPI."
+sequence = ["lint", "test", "build", "test-publish"]
+
+[tasks.publish]
+help = "Publish the built package to PyPI via token."
+cmd = "uv publish --system-certs"
+envfile=".env"
+
+[tasks.deploy]
+help = "Lint and test the code before building and publishing the Python package to PyPI."
+sequence = ["lint", "test", "build", "publish"]

@@ -1,0 +1,6 @@
+# Automatic Tests: [Pytest](https://docs.pytest.org)
+
+[ini_options]
+addopts = "-s --color=yes --tb=short"
+pythonpath = ["src"]
+testpaths = ["tests"]
