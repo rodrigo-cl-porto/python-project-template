@@ -1,0 +1,10 @@
+# Test Coverage: [Coverage.py](https://coverage.readthedocs.io) through [pytest-cov](https://pytest-cov.readthedocs.io)
+
+[run]
+source_pkgs = my_awesome_project
+branch = true
+
+[report]
+fail_under = 80
+show_missing = true
+skip_covered = true

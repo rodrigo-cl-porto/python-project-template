@@ -9,6 +9,7 @@ shell = """
     rm -rf dist &
     rm -rf .pytest_cache &
     rm -rf .ruff_cache &
+    rm -f .coverage &
     rm -rf docs/_build
 """
 
@@ -21,13 +22,28 @@ help = "Serve the documentation site."
 cmd = "zensical serve"
 
 [tasks.test]
-help = "Run all the automatic tests."
-cmd = "pytest --maxfail=1"
-cwd = "tests"
+help = "Run all the automatic tests and enforce the minimum test coverage."
+cmd = "pytest --maxfail=1 --cov"
 
 [tasks.lint]
 help = "Lint the code using Ruff linter."
 cmd = "ruff check"
+
+[tasks.format]
+help = "Format the code using Ruff formatter."
+cmd = "ruff format"
+
+[tasks.typecheck]
+help = "Check the types using ty type checker."
+cmd = "ty check"
+
+[tasks.check]
+help = "Check linting, formatting and types without modifying any file."
+sequence = [
+    { cmd = "ruff check --no-fix" },
+    { cmd = "ruff format --check" },
+    { cmd = "ty check" },
+]
 
 [tasks.build]
 help = "Build the Python package to dist folder."
@@ -42,8 +58,8 @@ cmd = "uv publish --system-certs --index testpypi --token $UV_TEST_PUBLISH_TOKEN
 envfile=".env"
 
 [tasks.test-deploy]
-help = "Lint and test the code before building and publishing the Python package to TestPyPI."
-sequence = ["lint", "test", "build", "test-publish"]
+help = "Check and test the code before building and publishing the Python package to TestPyPI."
+sequence = ["check", "test", "build", "test-publish"]
 
 [tasks.publish]
 help = "Publish the built package to PyPI via token."
@@ -51,5 +67,5 @@ cmd = "uv publish --system-certs"
 envfile=".env"
 
 [tasks.deploy]
-help = "Lint and test the code before building and publishing the Python package to PyPI."
-sequence = ["lint", "test", "build", "publish"]
+help = "Check and test the code before building and publishing the Python package to PyPI."
+sequence = ["check", "test", "build", "publish"]

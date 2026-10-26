@@ -60,9 +60,6 @@ ignore = [
     "W293"
 ]
 
-[lint.per-file-ignores]
-"tests/**/*.py" = ["ANN201", "S101"]
-
 [format]
 quote-style = "double"
 indent-style = "space"

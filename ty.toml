@@ -1,4 +1,4 @@
-# Type Checker: [Ty](https://docs.astral.sh/ty)
+# Type Checker: [ty](https://docs.astral.sh/ty)
 
 [environment]
 root = ["./src"]
