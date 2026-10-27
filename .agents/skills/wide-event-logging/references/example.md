@@ -260,7 +260,6 @@ def failing_checkout() -> None:
 def test_failed_unit_of_work_appends_one_json_line_to_the_events_file(events_file: Path):
     with pytest.raises(PaymentDeclinedError):
         failing_checkout()
-
     events = [json.loads(line) for line in events_file.read_text(encoding="utf-8").splitlines()]
     assert len(events) == 1
     assert events[0]["outcome"] == "error"

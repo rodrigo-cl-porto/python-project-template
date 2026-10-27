@@ -407,8 +407,9 @@ src/my_awesome_project/domain/
 ### 10. Avoid blank lines inside function and method bodies
 
 A blank line inside the body of a function or method (docstrings excluded) usually separates two different steps, which
-is a sign that the function does more than one thing and must be split. The only exception is the blank line that separates the
-Arrange/Act/Assert phases of a test (see [`tests.md`](tests.md#5-structure-each-test-with-arrangeactassert-givenwhenthen)).
+is a sign that the function does more than one thing and must be split. This also applies to test functions: their
+Arrange/Act/Assert phases are not separated by blank lines
+(see [`tests.md`](tests.md#5-structure-each-test-with-arrangeactassert-aaa)).
 
 ❌ Undesirable:
 

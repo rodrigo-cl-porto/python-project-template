@@ -10,11 +10,17 @@
 A template for starting any Python project with readiness: a modern toolchain, opinionated conventions and automation
 already wired together, so a new project can focus on its own problem from the first commit.
 
+> [!IMPORTANT]
+> **Do NOT clone or fork this repository to start a new project.**
+> Click the green **"Use this template"** button at the top of this repository's page on GitHub and choose **"Create a new repository"**.
+> This creates an independent repository with a clean Git history, not linked to this template.
+> See [Getting started](#getting-started).
+
 ## Goal
 
 This repository is the **starting point for new Python projects**. Instead of configuring packaging, linting, type
-checking, testing, documentation and publishing from scratch every time, you clone this template, rename the
-placeholder package (`my-awesome-project`, imported as `my_awesome_project`) and start writing code.
+checking, testing, documentation and publishing from scratch every time, you create a new repository from this
+template (with the **"Use this template"** button), rename the placeholder package (`my-awesome-project`, imported as `my_awesome_project`) and start writing code.
 
 It provides:
 
@@ -29,9 +35,8 @@ It provides:
 
 ## Prerequisites: install uv globally
 
-Every dependency, virtual environment and Python interpreter in this project is managed by
-**[uv](https://docs.astral.sh/uv/)**. **If uv is not installed on your machine yet, install it globally before doing
-anything else:**
+Every dependency, virtual environment and Python interpreter in this project is managed by **[uv](https://docs.astral.sh/uv/)**.
+**If uv is not installed on your machine yet, install it globally before doing anything else:**
 
 ```bash
 # macOS and Linux
@@ -51,15 +56,34 @@ need to install Python yourself: uv downloads the version pinned in `.python-ver
 
 ## Getting started
 
+### 1. Create your repository from the template
+
+> [!WARNING]
+> **Do not run `git clone` on this repository and do not fork it.** A clone keeps this template as the `origin`
+> remote, and a fork stays linked to it (pull requests default to the template, and the full history comes along).
+> Neither is meant for starting a new project.
+
+1. On this repository's page on GitHub, click the green **"Use this template"** button.
+2. Select **"Create a new repository"**.
+3. Choose the owner and name of your new repository (e.g. `my-awesome-project`) and click **"Create repository"**.
+
+See GitHub's guide on
+[creating a repository from a template](https://docs.github.com/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template)
+for details.
+
+### 2. Clone **your new repository** and set it up
+
+Clone the repository you just created (not this template):
+
 ```bash
-git clone https://github.com/john-doe/my-awesome-project.git
+git clone https://github.com/<your-user>/my-awesome-project.git
 cd my-awesome-project
 uv sync --all-groups      # Creates .venv and installs every dependency group
 uv run poe check          # Lint, formatting and type checks
 uv run poe test           # Tests with coverage (fails below 80%)
 ```
 
-After cloning, rename `my-awesome-project` / `my_awesome_project` and update the metadata (description, authors and
+Then rename `my-awesome-project` / `my_awesome_project` and update the metadata (description, authors and
 URLs) in `pyproject.toml`.
 
 ## Frameworks

@@ -32,7 +32,6 @@ class TestMoney(unittest.TestCase):
 ```python
 def test_money_addition_sums_the_amounts():
     total = Money(Decimal(10)) + Money(Decimal(5))
-
     assert total == Money(Decimal(15))
 ```
 
@@ -95,9 +94,7 @@ sleeps) with stubs and fakes in unit tests; real infrastructure belongs only in 
 ```python
 def test_convert_price_to_euros():
     convert_price = ConvertPrice(HttpExchangeRateProvider("https://api.exchange-rates.example"))
-
     converted = convert_price.execute(Money(Decimal(100)), "EUR")
-
     assert converted.currency == "EUR"
 ```
 
@@ -111,9 +108,7 @@ class StubExchangeRateProvider:
 
 def test_convert_price_applies_the_exchange_rate():
     convert_price = ConvertPrice(StubExchangeRateProvider())
-
     converted = convert_price.execute(Money(Decimal(100)), "EUR")
-
     assert converted == Money(Decimal(50), "EUR")
 ```
 
@@ -131,16 +126,13 @@ repository = InMemoryOrderRepository()
 
 def test_add_order():
     repository.add(Order(order_id="42"))
-
     assert repository.get("42") is not None
 
 
 def test_pay_order():
     order = repository.get("42")
     order.add_line(OrderLine("book", Money(Decimal(10)), quantity=1))
-
     order.pay()
-
     assert order.status is OrderStatus.PAID
 ```
 
@@ -154,15 +146,12 @@ def draft_order() -> Order:
 
 def test_added_order_can_be_retrieved(draft_order: Order):
     repository = InMemoryOrderRepository()
-
     repository.add(draft_order)
-
     assert repository.get("42") == draft_order
 
 
 def test_paying_an_order_changes_its_status_to_paid(draft_order: Order):
     draft_order.pay()
-
     assert draft_order.status is OrderStatus.PAID
 ```
 
@@ -177,7 +166,6 @@ date or time, randomness, the network or external APIs that may answer different
 ```python
 def test_coupon_is_not_expired():
     coupon = Coupon(code="BLACKFRIDAY", expires_on=date(2026, 11, 30))
-
     assert not coupon.is_expired()
 ```
 
@@ -186,9 +174,7 @@ def test_coupon_is_not_expired():
 ```python
 def test_coupon_is_not_expired_before_its_expiration_date():
     coupon = Coupon(code="BLACKFRIDAY", expires_on=date(2026, 11, 30))
-
     is_expired = coupon.is_expired(today=date(2026, 11, 29))
-
     assert is_expired is False
 ```
 
@@ -202,9 +188,7 @@ def test_checkout_charges_the_cart_once(user: User, cart: Cart):
     payment_gateway = create_autospec(PaymentGateway, instance=True)
     payment_gateway.charge.return_value = Receipt(provider="stripe", attempt=1, latency_ms=120)
     checkout = Checkout(cart_repository=InMemoryCartRepository([cart]), payment_gateway=payment_gateway)
-
     checkout.execute(user, cart_id=cart.cart_id)
-
     payment_gateway.charge.assert_called_once_with(cart)
 ```
 
@@ -219,7 +203,6 @@ exceptions with precise assertions. To check a test, break the code on purpose a
 ```python
 def test_apply_discount():
     total = apply_discount(Order(order_id="42", total=100.0), Coupon(rate=0.1, is_expired=False))
-
     assert total is not None
 ```
 
@@ -236,9 +219,7 @@ def test_apply_discount():
 )
 def test_apply_discount_returns_the_expected_total(coupon: Coupon | None, expected_total: float):
     order = Order(order_id="42", total=100.0)
-
     total = apply_discount(order, coupon)
-
     assert total == pytest.approx(expected_total)
 
 
@@ -263,9 +244,9 @@ Every test has three phases, in this order:
 | **Act**     | Execute the single behavior under test.              |
 | **Assert**  | Verify the result, the state changes or the calls.   |
 
-- Separate the phases with a single blank line. In test functions this is the only exception to the
-  [no blank lines rule](code-standards.md#10-avoid-blank-lines-inside-function-and-method-bodies); do not label the
-  phases with comments.
+- Do not separate the phases with blank lines: test functions follow the
+  [no blank lines rule](code-standards.md#10-avoid-blank-lines-inside-function-and-method-bodies) like any other
+  function. Keep the phases in order and do not label them with comments.
 - Test one behavior per test, with a single Act phase.
 - Name the test after the behavior and its expected outcome, e.g. `test_paying_an_empty_order_is_rejected`.
 
@@ -287,18 +268,14 @@ def test_order():
 ```python
 def test_paying_an_empty_order_is_rejected():
     order = Order(order_id="42")
-
     with pytest.raises(EmptyOrderError, match="Cannot pay empty order 42"):
         order.pay()
-
     assert order.status is OrderStatus.DRAFT
 
 
 def test_order_total_sums_the_line_subtotals():
     order = Order(order_id="42")
-
     order.add_line(OrderLine("book", Money(Decimal(10)), quantity=2))
-
     assert order.total == Money(Decimal(20))
 ```
 
@@ -342,7 +319,6 @@ from my_awesome_project.domain.money import Money
 )
 def test_money_addition_sums_the_amounts(first: Decimal, second: Decimal, expected: Decimal):
     total = Money(first) + Money(second)
-
     assert total == Money(expected)
 
 
@@ -376,9 +352,7 @@ def connection(tmp_path: Path) -> Iterator[sqlite3.Connection]:
 
 def test_saved_order_can_be_retrieved(connection: sqlite3.Connection):
     repository = SqliteOrderRepository(connection)
-
     repository.add(Order(order_id="42", total=100.0))
-
     assert repository.get("42") == Order(order_id="42", total=100.0)
 ```
 
@@ -402,9 +376,7 @@ def test_user_can_complete_checkout(page: Page):
     page.goto(f"{BASE_URL}/products")
     page.get_by_role("button", name="Add to cart").first.click()
     page.get_by_role("link", name="Cart").click()
-
     page.get_by_role("button", name="Checkout").click()
-
     expect(page).to_have_url(re.compile(r".*/orders/\w+"))
     expect(page.get_by_text("Order placed successfully")).to_be_visible()
 ```

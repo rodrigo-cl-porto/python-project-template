@@ -401,9 +401,7 @@ class FakeNotifier:
 def test_place_order_saves_order_and_notifies():
     repository = InMemoryOrderRepository()
     notifier = FakeNotifier()
-
     PlaceOrder(repository, notifier).execute(Order(order_id="42", total=100.0))
-
     assert repository.get("42") is not None
     assert notifier.messages == ["Order 42 placed"]
 ```
