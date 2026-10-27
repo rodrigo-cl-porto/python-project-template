@@ -58,7 +58,8 @@ Poe the Poet tasks (`uv run poe <task>`).
 [`.agents/rules/code-standards.md`](.agents/rules/code-standards.md).** It defines the code conventions (Python
 3.13+ syntax, mandatory type annotations, Google-style docstrings, Ruff rules) and the Clean Code rules, with
 undesirable and fixed examples: no magic numbers, intention-revealing names, small functions, guard clauses (early
-return), classes to group related logic, specific exceptions, DRY and meaningful comments.
+return), no `break`/`continue` or tautologies such as `while True`, classes to group related logic, specific
+exceptions, DRY and meaningful comments.
 
 @.agents/rules/code-standards.md
 

@@ -1,21 +1,22 @@
 {
-    "recommendations": [
-        "astral-sh.ty",
-        "bierner.github-markdown-preview",
-        "bradlc.vscode-tailwindcss",
-        "charliermarsh.ruff",
-        "dracula-theme.theme-dracula",
-        "esbenp.prettier-vscode",
-        "formulahendry.code-runner",
-        "GitHub.copilot-chat",
-        "github.vscode-github-actions",
-        "ms-python.debugpy",
-        "ms-python.python",
-        "ms-python.vscode-pylance",
-        "ms-toolsai.jupyter",
-        "oderwat.indent-rainbow",
-        "omthemes.omthemes",
-        "tamasfe.even-better-toml",
-        "vscode-icons-team.vscode-icons"
-    ]
+  "recommendations": [
+    "bierner.github-markdown-preview",
+    "bradlc.vscode-tailwindcss",
+    "charliermarsh.ruff",
+    "dracula-theme.theme-dracula",
+    "esbenp.prettier-vscode",
+    "formulahendry.code-runner",
+    "GitHub.copilot-chat",
+    "github.vscode-github-actions",
+    "ms-python.debugpy",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "ms-toolsai.jupyter",
+    "oderwat.indent-rainbow",
+    "omthemes.omthemes",
+    "tamasfe.even-better-toml",
+    "vscode-icons-team.vscode-icons",
+    "astral-sh.ty",
+    "anthropic.claude-code"
+  ]
 }

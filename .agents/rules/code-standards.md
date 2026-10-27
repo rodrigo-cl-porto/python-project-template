@@ -212,6 +212,60 @@ def get_tax_rate(state: str) -> float:
     return TAX_RATE_BY_STATE[state]
 ```
 
+Prefer to avoid the `break` and `continue` keywords in loops and in the conditionals inside them. They jump out of the
+natural top-to-bottom flow, so the reader must track every exit point to know when the loop ends or which items it
+processes. Express the intent directly instead: filter with a comprehension or generator, search with `next()`,
+`any()` or `all()`, or extract the loop into a function and `return` from it.
+
+❌ Undesirable:
+
+```python
+def find_first_overdue_invoice(invoices: list[Invoice], today: date) -> Invoice | None:
+    overdue_invoice = None
+    for invoice in invoices:
+        if invoice.is_paid:
+            continue
+        if invoice.due_date < today:
+            overdue_invoice = invoice
+            break
+    return overdue_invoice
+```
+
+✅ Fixed:
+
+```python
+def find_first_overdue_invoice(invoices: list[Invoice], today: date) -> Invoice | None:
+    return next((invoice for invoice in invoices if invoice.is_overdue(today)), None)
+```
+
+Also avoid tautological conditions such as `if True:` and `while True:`. A condition that is always true hides the real
+rule that controls the flow, which ends up buried in a `break` somewhere in the body. Write the actual condition in the
+`while` statement (the walrus operator `:=` helps when the value must be read before it is checked), and remove
+`if True:` blocks altogether.
+
+❌ Undesirable:
+
+```python
+def read_commands(reader: CommandReader) -> list[Command]:
+    commands = []
+    while True:
+        line = reader.read_line()
+        if line == EXIT_COMMAND:
+            break
+        commands.append(parse_command(line))
+    return commands
+```
+
+✅ Fixed:
+
+```python
+def read_commands(reader: CommandReader) -> list[Command]:
+    commands = []
+    while (line := reader.read_line()) != EXIT_COMMAND:
+        commands.append(parse_command(line))
+    return commands
+```
+
 ### 5. Prefer classes to group related logic and state
 
 When several functions operate on the same data, or pass the same arguments around, group them in a class. Use
