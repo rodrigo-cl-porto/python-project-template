@@ -10,38 +10,72 @@ description: >-
 
 # Architecture Standards
 
-Architectural patterns and design principles of this repository. They complement [`AGENTS.md`](../../../AGENTS.md) and
-[`code-standards.md`](../../rules/code-standards.md), and every agent must follow them when designing, writing or
-reviewing code inside `src/`.
+Architectural patterns and design principles of this repository. They complement [`AGENTS.md`](../../../AGENTS.md) and [`code-standards.md`](../../rules/code-standards.md), and every agent must follow them when designing, writing or reviewing code inside `src/`.
 
-The preferred architectural patterns are **Clean Architecture**, **Ports and Adapters (Hexagonal Architecture)** and
-**Domain-Driven Design (DDD)**. They complement each other: DDD models the business, Ports and Adapters isolates the
-business from technology, and Clean Architecture defines the dependency direction between layers.
+The preferred architectural patterns are **Clean Architecture**, **Ports and Adapters (Hexagonal Architecture)** and **Domain-Driven Design (DDD)**. They complement each other: DDD models the business, Ports and Adapters isolates the business from technology, and Clean Architecture defines the dependency direction between layers.
+
+## Why these architectures
+
+These patterns were chosen for two goals, and every rule in this skill exists to serve them:
+
+1. **Avoid high coupling between components.** Each component must know as little as possible about the others. Components talk through small, explicit contracts (ports) instead of reaching into each other's concrete classes, so a component can be changed, replaced or tested without a cascade of changes in the rest of the application.
+2. **Inner components must never depend on, or even know about, outer components.** The application is organized in layers, from the innermost (the domain, the business rules) to the outermost (adapters, frameworks, databases, the web, the CLI). **Outer layers may know and use the inner layers in order to drive the application, but never the other way around.** The domain never imports, references or names anything from the application layer or the adapters, and the application layer never imports, references or names anything from the adapters.
+
+```mermaid
+graph TB
+    subgraph Adapters ["Adapters (Knows App & Domain)"]
+        direction TB
+        inbound["Inbound:CLI, REST, Events"]
+        outbound["Outbound: DB, Mail, Clients"]
+        subgraph Application["Application (Knows Domain Only)"]
+            direction TB
+            use_cases["Use Cases"]
+            ports["Ports (Protocols)"]
+            subgraph Domain["Domain (Independent)"]
+                models["Entities & Domain Services"]
+            end
+        end
+        inbound --> Application
+        outbound --> Application
+        use_cases --> Domain
+        ports --> Domain
+    end
+```
+
+Each layer is fully contained in the layer around it, and every arrow (a source code dependency) points inwards: from the adapters to the application and the domain, and from the application to the domain. No arrow ever leaves an inner layer towards an outer one.
+
+
+Why this matters:
+
+- **The business is the most stable and valuable part of the code; technology is the most volatile.** Databases, frameworks, external APIs and delivery mechanisms change far more often than the business rules. If the inner layers depended on them, every technical change would ripple into the business rules. With dependencies pointing inwards, technical changes stay confined to the outer layers.
+- **Details are replaceable.** Swapping SQLite for PostgreSQL, a CLI for a REST API, or one email provider for another means writing a new adapter and wiring it in the composition root (`bootstrap.py`); the domain and the use cases stay untouched.
+- **The core is testable in isolation.** Because the domain and the use cases know only abstractions, they can be exercised with fast test doubles, without databases, networks or frameworks (see [`tests.md`](../../rules/tests.md)).
+- **Changes have a predictable blast radius.** Low coupling means a change in one component affects only the components that explicitly depend on its contract, which keeps the code easy to understand, review and evolve.
+
+When the inner layer needs something that lives outside it (persisting data, sending a message, reading the clock), it **does not reach out to the outer layer**: it declares a port describing what it needs, and an outer adapter implements that port. The dependency in the source code is inverted, pointing inwards, even though the flow of control at runtime goes outwards. This is the reason for the [Dependency Rule](#the-dependency-rule), the [Dependency Inversion Principle](#d--dependency-inversion-principle) and the [Ports and Adapters](#ports-and-adapters) sections below.
 
 ## Recommended package layout
 
-```text
+```mermaid
+treeView-beta
 src/my_awesome_project/
-├── domain/              # Enterprise business rules (DDD): entities, value objects, aggregates,
-│   │                    # domain services, domain events and domain exceptions. Pure Python, no I/O.
-│   ├── models.py
-│   └── exceptions.py
-├── application/         # Application business rules: use cases and ports (interfaces).
-│   ├── ports.py         # Abstract interfaces (typing.Protocol) the use cases depend on.
-│   └── use_cases.py
-├── adapters/            # Concrete implementations of the ports.
-│   ├── inbound/         # Driving adapters: CLI, REST API, message consumers.
-│   ├── outbound/        # Driven adapters: databases, HTTP clients, email, file system.
-│   ├── code_origin.py   # File and function where the main event of a wide event occurred.
-│   └── observability.py # structlog configuration and wide event helpers.
-└── bootstrap.py         # Composition root: wires adapters into use cases.
+    domain/ ## Enterprise business rules (DDD): entities, value objects, aggregates, domain services, domain events and domain exceptions. Pure Python, no I/O.
+        models.py
+        exceptions.py
+    application/ ## Application business rules: use cases and ports (interfaces).
+        ports.py ## Abstract interfaces (typing.Protocol) the use cases depend on.
+        use_cases.py
+    adapters/ ## Concrete implementations of the ports.
+        inbound/ ## Driving adapters: CLI, REST API, message consumers.
+        outbound/ ## Driven adapters: databases, HTTP clients, email, file system.
+        code_origin.py ## File and function where the main event of a wide event occurred.
+        observability.py ## structlog configuration and wide event helpers.
+    bootstrap.py ## Composition root: wires adapters into use cases.
 ```
 
 ## The Dependency Rule
 
-Dependencies always point **inwards**: `adapters → application → domain`. The domain knows nothing about the
-application layer, and neither of them knows about frameworks, databases or the web. Frameworks are details plugged in
-at the edges.
+Dependencies always point **inwards**: `adapters → application → domain`. The domain knows nothing about the application layer, and neither of them knows about frameworks, databases or the web. Frameworks are details plugged in at the edges. An import that points outwards (from `domain/` to `application/` or `adapters/`, or from `application/` to `adapters/`) is always a violation, whatever the reason (see [Why these architectures](#why-these-architectures)).
 
 ❌ Undesirable — business rule coupled to the database and to a framework:
 
@@ -104,8 +138,7 @@ class SqliteOrderRepository:
 
 ## SOLID principles
 
-The five SOLID principles guide the design of classes and modules in every layer. They are what make the Dependency
-Rule and the Ports and Adapters architecture work in practice.
+The five SOLID principles guide the design of classes and modules in every layer. They are what make the Dependency Rule and the Ports and Adapters architecture work in practice.
 
 | Letter | Principle             | In one sentence                                                      |
 | ------ | --------------------- | -------------------------------------------------------------------- |
@@ -117,9 +150,7 @@ Rule and the Ports and Adapters architecture work in practice.
 
 ### S — Single Responsibility Principle
 
-A class must have only one reason to change, that is, it must serve a single actor or concern. Business rules,
-presentation and persistence change for different reasons and belong to different classes (and, usually, to different
-layers).
+A class must have only one reason to change, that is, it must serve a single actor or concern. Business rules, presentation and persistence change for different reasons and belong to different classes (and, usually, to different layers).
 
 ❌ Undesirable — the invoice calculates its total, renders itself as PDF and saves itself in the database:
 
@@ -166,8 +197,7 @@ class SqliteInvoiceRepository:
 
 ### O — Open/Closed Principle
 
-A module must be open for extension but closed for modification: adding a new behavior must mean adding new code, not
-editing code that already works and is tested.
+A module must be open for extension but closed for modification: adding a new behavior must mean adding new code, not editing code that already works and is tested.
 
 ❌ Undesirable — every new customer tier requires editing the function and retesting every branch:
 
@@ -213,12 +243,9 @@ def calculate_discount(customer: Customer, total: Money) -> Money:
 
 ### L — Liskov Substitution Principle
 
-Every implementation of a port (or subclass of a base class) must honor the contract of its abstraction: it accepts
-the same inputs, returns the same kind of result and raises no new, unexpected exceptions. Callers must be able to use
-any implementation without knowing which one they received.
+Every implementation of a port (or subclass of a base class) must honor the contract of its abstraction: it accepts the same inputs, returns the same kind of result and raises no new, unexpected exceptions. Callers must be able to use any implementation without knowing which one they received.
 
-❌ Undesirable — the port promises `None` for a missing order, but this adapter raises `KeyError`, breaking every
-caller that checks for `None`:
+❌ Undesirable — the port promises `None` for a missing order, but this adapter raises `KeyError`, breaking every caller that checks for `None`:
 
 ```python
 class OrderRepository(Protocol):
@@ -252,11 +279,9 @@ class CachedOrderRepository:
 
 ### I — Interface Segregation Principle
 
-Clients must not be forced to depend on methods they do not use. Prefer several small, role-based ports over one large
-"do everything" interface. Small ports are also easier to replace with test doubles.
+Clients must not be forced to depend on methods they do not use. Prefer several small, role-based ports over one large "do everything" interface. Small ports are also easier to replace with test doubles.
 
-❌ Undesirable — a read-only report use case depends on a port that can also write, delete and export, and every fake
-used in its tests must implement all of those methods:
+❌ Undesirable — a read-only report use case depends on a port that can also write, delete and export, and every fake used in its tests must implement all of those methods:
 
 ```python
 class OrderRepository(Protocol):
@@ -290,10 +315,7 @@ class GenerateSalesReport:
 
 ### D — Dependency Inversion Principle
 
-High-level modules (use cases, domain) must not depend on low-level modules (databases, HTTP clients, frameworks).
-Both depend on abstractions, and the abstractions are owned by the high-level side. In this repository, that means use
-cases depend on ports defined in `application/`, and the concrete adapters are injected by the composition root (see
-[Ports and Adapters](#ports-and-adapters)).
+High-level modules (use cases, domain) must not depend on low-level modules (databases, HTTP clients, frameworks). Both depend on abstractions, and the abstractions are owned by the high-level side. In this repository, that means use cases depend on ports defined in `application/`, and the concrete adapters are injected by the composition root (see [Ports and Adapters](#ports-and-adapters)).
 
 ❌ Undesirable — the use case imports and builds a concrete adapter, so it cannot run without a real SMTP server:
 
@@ -332,12 +354,10 @@ def build_cancel_order() -> CancelOrder:
 
 ## Ports and Adapters
 
-- **Ports** are interfaces owned by the application layer. Define them with `typing.Protocol` (structural typing,
-  no inheritance required) or `abc.ABC`.
+- **Ports** are interfaces owned by the application layer. Define them with `typing.Protocol` (structural typing, no inheritance required) or `abc.ABC`.
 - **Driven (outbound) adapters** implement ports to talk to the outside world (database, email, external APIs).
 - **Driving (inbound) adapters** call the use cases (CLI, HTTP controllers, scheduled jobs).
-- **Use cases depend on ports, never on concrete adapters.** Dependencies are injected through the constructor
-  (Dependency Inversion Principle).
+- **Use cases depend on ports, never on concrete adapters.** Dependencies are injected through the constructor (Dependency Inversion Principle).
 
 ❌ Undesirable — use case instantiates its own infrastructure:
 
@@ -374,8 +394,7 @@ def build_place_order() -> PlaceOrder:
     return PlaceOrder(repository=SqliteOrderRepository(connection), notifier=SmtpNotifier(settings.smtp_host))
 ```
 
-This makes use cases trivial to test with test doubles such as in-memory fakes, without real infrastructure (see
-[`tests.md`](../../rules/tests.md)):
+This makes use cases trivial to test with test doubles such as in-memory fakes, without real infrastructure (see [`tests.md`](../../rules/tests.md)):
 
 ```python
 # tests/unit/test_place_order.py
@@ -408,13 +427,10 @@ def test_place_order_saves_order_and_notifies():
 
 ## Domain-Driven Design
 
-- **Ubiquitous language:** name classes, methods and modules with the same terms the business experts use (in
-  English). If the business says "an invoice is *issued*", write `invoice.issue()`, not `invoice.set_status(2)`.
+- **Ubiquitous language:** name classes, methods and modules with the same terms the business experts use (in English). If the business says "an invoice is *issued*", write `invoice.issue()`, not `invoice.set_status(2)`.
 - **Entities** have an identity that persists over time (`Order`, `Customer`).
-- **Value objects** are defined only by their attributes, are immutable and validate themselves on creation. Use
-  `@dataclass(frozen=True)`.
-- **Aggregates** are clusters of objects changed together through a single root, which protects their invariants.
-  External code never modifies inner objects directly.
+- **Value objects** are defined only by their attributes, are immutable and validate themselves on creation. Use `@dataclass(frozen=True)`.
+- **Aggregates** are clusters of objects changed together through a single root, which protects their invariants. External code never modifies inner objects directly.
 - **Repositories** (ports) load and persist whole aggregates.
 - **Domain services** hold business logic that does not naturally belong to a single entity.
 

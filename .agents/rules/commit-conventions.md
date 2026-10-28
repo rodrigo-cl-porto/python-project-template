@@ -1,7 +1,6 @@
 # Commit Conventions
 
-Commit message conventions of this repository. They complement [`AGENTS.md`](../../AGENTS.md), and every agent must
-follow them when writing or reviewing commit messages.
+Commit message conventions of this repository. They complement [`AGENTS.md`](../../AGENTS.md), and every agent must follow them when writing or reviewing commit messages.
 
 ## Conventional Commits
 
@@ -50,8 +49,7 @@ feat(orders): add order cancellation
 ```text
 fix(payment): retry charge on gateway timeout
 
-The payment gateway occasionally times out under load. Retrying with
-exponential backoff avoids failing checkouts that would succeed.
+The payment gateway occasionally times out under load. Retrying with exponential backoff avoids failing checkouts that would succeed.
 
 Refs: #87
 ```
@@ -59,6 +57,5 @@ Refs: #87
 ```text
 feat(api)!: return amounts in cents instead of decimals
 
-BREAKING CHANGE: every monetary field in the API response is now an integer
-number of cents.
+BREAKING CHANGE: every monetary field in the API response is now an integer number of cents.
 ```

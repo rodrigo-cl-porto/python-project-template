@@ -17,6 +17,8 @@
     "tamasfe.even-better-toml",
     "vscode-icons-team.vscode-icons",
     "astral-sh.ty",
-    "anthropic.claude-code"
+    "anthropic.claude-code",
+    "vstirbu.vscode-mermaid-preview",
+    "mermaidchart.vscode-mermaid-chart"
   ]
 }

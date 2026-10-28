@@ -1,7 +1,6 @@
 # Wide Event Logging Example
 
-Complete example of the [wide event logging skill](../SKILL.md): one wide event per unit of work, with the execution
-date and time and the origin of the main event, enriched along the way, emitted once and appended to a `.jsonl` file.
+Complete example of the [wide event logging skill](../SKILL.md): one wide event per unit of work, with the execution date and time and the origin of the main event, enriched along the way, emitted once and appended to a `.jsonl` file.
 
 ## ❌ Undesirable
 
@@ -68,10 +67,7 @@ def find_raising_code(traceback: TracebackType | None, default: CodeType) -> Cod
 
 ### `adapters/observability.py`
 
-`configure_logging` renders each event as a single JSON line and appends it to `logs/events.jsonl` at the repository
-root. The `logs/` folder is resolved from the location of this file
-(`src/my_awesome_project/adapters/observability.py`), never from the current working directory. The `events_file`
-parameter exists only so tests can redirect the events to `tmp_path`.
+`configure_logging` renders each event as a single JSON line and appends it to `logs/events.jsonl` at the repository root. The `logs/` folder is resolved from the location of this file (`src/my_awesome_project/adapters/observability.py`), never from the current working directory. The `events_file` parameter exists only so tests can redirect the events to `tmp_path`.
 
 ```python
 import functools

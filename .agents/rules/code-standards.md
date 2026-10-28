@@ -1,7 +1,6 @@
 # Code Standards
 
-Coding conventions and Clean Code rules for this repository. They complement [`AGENTS.md`](../../AGENTS.md), and
-every agent must follow them when writing or reviewing Python code.
+Coding conventions and Clean Code rules for this repository. They complement [`AGENTS.md`](../../AGENTS.md), and every agent must follow them when writing or reviewing Python code.
 
 ## Code conventions
 
@@ -10,14 +9,75 @@ every agent must follow them when writing or reviewing Python code.
 - Write **Google-style docstrings**; they feed the documentation through `mkdocstrings`.
 - Follow the configured Ruff rules; do not disable rules without a justified need.
 
+## Markdown conventions
+
+- **Do not hard-wrap paragraphs** in Markdown files (`AGENTS.md`, `README.md`, `CHANGELOG.md`, `docs/`, rules and skills). Write each paragraph, list item and blockquote on a single line, however long: editors and IDEs soft-wrap long lines in the UI, and the rendered output is the same. The 120-character limit applies to Python code only (Ruff), not to Markdown prose.
+- Line breaks still matter where Markdown requires them: code blocks, tables, directory trees and nested list items keep their own lines.
+
+❌ Undesirable:
+
+```markdown
+Every commit message follows Conventional Commits. The file defines the allowed types
+and their SemVer impact and the rules for scope, description, body, footers and
+breaking changes.
+```
+
+✅ Fixed:
+
+```markdown
+Every commit message follows Conventional Commits. The file defines the allowed types and their SemVer impact and the rules for scope, description, body, footers and breaking changes.
+```
+
+- **Draw diagrams with [Mermaid](https://mermaid.js.org/)**, never with ASCII art in `text` blocks. This applies to flowcharts, sequence diagrams, layer and component diagrams, state machines, class and entity-relationship diagrams, mind maps, timelines and any other chart. GitHub and VS Code (through the recommended `bierner.github-markdown-preview` extension pack) render Mermaid as a real diagram for human readers, and its declarative syntax states nodes and relationships explicitly, which LLMs read far more reliably than box-drawing characters. Browse the [Mermaid syntax reference](https://mermaid.js.org/syntax/) to pick the diagram type that best fits the content.
+- **Draw directory trees with Mermaid's [`treeView-beta`](https://mermaid.js.org/syntax/treeView.html) diagram.** It doesn't require the box-drawing tree (`├──`, `└──`, `│`) and descriptions follow the label after `##`. Command lines and commit message samples are not diagrams and stay in `text` blocks.
+
+❌ Undesirable:
+
+````markdown
+```text
+┌────────────┐      ┌─────────────┐      ┌────────┐
+│  adapters  │ ───► │ application │ ───► │ domain │
+└────────────┘      └─────────────┘      └────────┘
+```
+````
+
+✅ Fixed:
+
+````markdown
+```mermaid
+flowchart LR
+    adapters --> application --> domain
+```
+````
+
+❌ Undesirable:
+
+````markdown
+```text
+tests/
+├── unit/ # Fast, isolated tests without I/O
+└── e2e/  # Critical user journeys
+```
+````
+
+✅ Fixed:
+
+````markdown
+```mermaid
+treeView-beta
+tests/
+    unit/ ## Fast, isolated tests without I/O
+    e2e/ ## Critical user journeys
+```
+````
+
 ## Clean Code
 
 Every rule below shows an undesirable example (❌) and how to fix it (✅).
 
 ### 1. Avoid magic numbers and magic strings
 
-Unnamed literals hide intent and must be changed in many places. Give them a name with `Final`, an `Enum` or a
-configuration value.
+Unnamed literals hide intent and must be changed in many places. Give them a name with `Final`, an `Enum` or a configuration value.
 
 ❌ Undesirable:
 
@@ -72,9 +132,7 @@ if order.status is OrderStatus.SHIPPED:
 
 ### 2. Use meaningful, intention-revealing names
 
-A name must tell what a variable holds, what a function does or what a class represents, without needing a comment.
-Use `snake_case` for variables and functions, `PascalCase` for classes and `UPPER_SNAKE_CASE` for constants. Functions
-are verbs (`calculate_total`), booleans are questions (`is_active`, `has_permission`), classes are nouns (`Invoice`).
+A name must tell what a variable holds, what a function does or what a class represents, without needing a comment. Use `snake_case` for variables and functions, `PascalCase` for classes and `UPPER_SNAKE_CASE` for constants. Functions are verbs (`calculate_total`), booleans are questions (`is_active`, `has_permission`), classes are nouns (`Invoice`).
 
 ❌ Undesirable:
 
@@ -96,9 +154,7 @@ def calculate_active_items_total(items: list[OrderItem]) -> float:
 
 ### 3. Keep functions small and focused (Single Responsibility)
 
-A function should do one thing, at one level of abstraction. **Functions and methods must have at most 30 lines**
-(docstring not included). When a behavior needs more than that, split it into smaller functions or methods. A function
-that needs comments or blank lines to separate "sections" is also doing too much and must be split.
+A function should do one thing, at one level of abstraction. **Functions and methods must have at most 30 lines** (docstring not included). When a behavior needs more than that, split it into smaller functions or methods. A function that needs comments or blank lines to separate "sections" is also doing too much and must be split.
 
 ❌ Undesirable:
 
@@ -145,8 +201,7 @@ def validate_password(password: str) -> None:
 
 ### 4. Prefer guard clauses (early return) over nested or large if-else
 
-Handle invalid and edge cases first and leave the function early. The "happy path" stays at the lowest indentation
-level and is easy to read.
+Handle invalid and edge cases first and leave the function early. The "happy path" stays at the lowest indentation level and is easy to read.
 
 ❌ Undesirable:
 
@@ -212,10 +267,7 @@ def get_tax_rate(state: str) -> float:
     return TAX_RATE_BY_STATE[state]
 ```
 
-Prefer to avoid the `break` and `continue` keywords in loops and in the conditionals inside them. They jump out of the
-natural top-to-bottom flow, so the reader must track every exit point to know when the loop ends or which items it
-processes. Express the intent directly instead: filter with a comprehension or generator, search with `next()`,
-`any()` or `all()`, or extract the loop into a function and `return` from it.
+Prefer to avoid the `break` and `continue` keywords in loops and in the conditionals inside them. They jump out of the natural top-to-bottom flow, so the reader must track every exit point to know when the loop ends or which items it processes. Express the intent directly instead: filter with a comprehension or generator, search with `next()`, `any()` or `all()`, or extract the loop into a function and `return` from it.
 
 ❌ Undesirable:
 
@@ -238,10 +290,7 @@ def find_first_overdue_invoice(invoices: list[Invoice], today: date) -> Invoice 
     return next((invoice for invoice in invoices if invoice.is_overdue(today)), None)
 ```
 
-Also avoid tautological conditions such as `if True:` and `while True:`. A condition that is always true hides the real
-rule that controls the flow, which ends up buried in a `break` somewhere in the body. Write the actual condition in the
-`while` statement (the walrus operator `:=` helps when the value must be read before it is checked), and remove
-`if True:` blocks altogether.
+Also avoid tautological conditions such as `if True:` and `while True:`. A condition that is always true hides the real rule that controls the flow, which ends up buried in a `break` somewhere in the body. Write the actual condition in the `while` statement (the walrus operator `:=` helps when the value must be read before it is checked), and remove `if True:` blocks altogether.
 
 ❌ Undesirable:
 
@@ -268,8 +317,7 @@ def read_commands(reader: CommandReader) -> list[Command]:
 
 ### 5. Prefer classes to group related logic and state
 
-When several functions operate on the same data, or pass the same arguments around, group them in a class. Use
-`dataclasses` for data-centric objects.
+When several functions operate on the same data, or pass the same arguments around, group them in a class. Use `dataclasses` for data-centric objects.
 
 ❌ Undesirable:
 
@@ -391,10 +439,7 @@ employee_price = final_price(price, EMPLOYEE_DISCOUNT)
 
 ### 8. Do not write comments
 
-Code must explain itself through intention-revealing names, small functions and type annotations. **Do not insert
-comments**, unless they are absolutely necessary, such as explaining a complex regular expression or a workaround that
-cannot be expressed in code. Never leave commented-out code (Ruff's `ERA` rule flags it). Docstrings are not comments:
-keep Google-style docstrings on public APIs, since they feed the documentation.
+Code must explain itself through intention-revealing names, small functions and type annotations. **Do not insert comments**, unless they are absolutely necessary, such as explaining a complex regular expression or a workaround that cannot be expressed in code. Never leave commented-out code (Ruff's `ERA` rule flags it). Docstrings are not comments: keep Google-style docstrings on public APIs, since they feed the documentation.
 
 ❌ Undesirable:
 
@@ -436,34 +481,31 @@ SEMANTIC_VERSION_PATTERN: Final = re.compile(
 
 ### 9. Never write large files or classes
 
-**A `.py` file (and therefore any class in it) must have at most 100 lines.** It is preferable to split the code into
-several small, cohesive modules than to write one giant piece of logic in a single file. When a file approaches the
-limit, extract classes, functions or value objects into their own modules.
+**A `.py` file (and therefore any class in it) must have at most 100 lines.** It is preferable to split the code into several small, cohesive modules than to write one giant piece of logic in a single file. When a file approaches the limit, extract classes, functions or value objects into their own modules.
 
 ❌ Undesirable:
 
-```text
+```mermaid
+treeView-beta
 src/my_awesome_project/domain/
-└── models.py          # 650 lines: Money, Order, OrderLine, Customer, Invoice...
+    models.py ## 650 lines: Money, Order, OrderLine, Customer, Invoice...
 ```
 
 ✅ Fixed:
 
-```text
+```mermaid
+treeView-beta
 src/my_awesome_project/domain/
-├── money.py
-├── order.py
-├── order_line.py
-├── customer.py
-└── invoice.py
+    money.py
+    order.py
+    order_line.py
+    customer.py
+    invoice.py
 ```
 
 ### 10. Avoid blank lines inside function and method bodies
 
-A blank line inside the body of a function or method (docstrings excluded) usually separates two different steps, which
-is a sign that the function does more than one thing and must be split. This also applies to test functions: their
-Arrange/Act/Assert phases are not separated by blank lines
-(see [`tests.md`](tests.md#5-structure-each-test-with-arrangeactassert-aaa)).
+A blank line inside the body of a function or method (docstrings excluded) usually separates two different steps, which is a sign that the function does more than one thing and must be split. This also applies to test functions: their Arrange/Act/Assert phases are not separated by blank lines (see [`tests.md`](tests.md#5-structure-each-test-with-arrangeactassert-aaa)).
 
 ❌ Undesirable:
 
@@ -495,9 +537,7 @@ def calculate_net_amount(order: Order) -> float:
 
 ### 11. Avoid functions and methods with more than 4 parameters
 
-**Functions and methods must have at most 4 parameters** (`self` and `cls` are not counted). A long parameter list is a
-sign that the function must be split, or that related parameters belong together in a parameter object, such as a
-value object.
+**Functions and methods must have at most 4 parameters** (`self` and `cls` are not counted). A long parameter list is a sign that the function must be split, or that related parameters belong together in a parameter object, such as a value object.
 
 ❌ Undesirable:
 
@@ -528,8 +568,7 @@ def create_shipment(recipient_name: str, address: Address, weight_kg: float) -> 
 
 ### 12. Declare variables close to where they are used
 
-Declare each variable immediately before its first use, not at the top of the function. This keeps related lines
-together, makes the scope obvious and avoids computing values that an early return would discard.
+Declare each variable immediately before its first use, not at the top of the function. This keeps related lines together, makes the scope obvious and avoids computing values that an early return would discard.
 
 ❌ Undesirable:
 
@@ -559,10 +598,7 @@ def send_report(report: Report, recipients: list[str]) -> None:
 
 ### 13. Never put sensitive data in the code
 
-**Never hardcode sensitive data** such as API keys, tokens, passwords or connection strings in the code, in tests or in
-configuration files under version control. Keep them in an external `.env` file (already listed in `.gitignore`) and
-read them at runtime, for example with [`pydantic-settings`](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)
-(`uv add pydantic-settings`). Commit a `.env.example` file with the variable names and placeholder values only.
+**Never hardcode sensitive data** such as API keys, tokens, passwords or connection strings in the code, in tests or in configuration files under version control. Keep them in an external `.env` file (already listed in `.gitignore`) and read them at runtime, for example with [`pydantic-settings`](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) (`uv add pydantic-settings`). Commit a `.env.example` file with the variable names and placeholder values only.
 
 ❌ Undesirable:
 
@@ -586,7 +622,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
-
     payment_api_key: SecretStr
 
 

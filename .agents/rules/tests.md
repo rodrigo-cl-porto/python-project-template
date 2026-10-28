@@ -1,20 +1,15 @@
 # Testing Rules
 
-Rules for writing automated tests in this repository. They complement [`AGENTS.md`](../../AGENTS.md) and
-[`code-standards.md`](code-standards.md), and every agent must follow them when writing or reviewing code.
+Rules for writing automated tests in this repository. They complement [`AGENTS.md`](../../AGENTS.md) and [`code-standards.md`](code-standards.md), and every agent must follow them when writing or reviewing code.
 
 ## 1. Every piece of code must be covered by automated tests
 
-**This rule is CRITICAL and must never be ignored.** No feature, bug fix or refactoring is complete until it is covered
-by passing automated tests.
+**This rule is CRITICAL and must never be ignored.** No feature, bug fix or refactoring is complete until it is covered by passing automated tests.
 
 - **If a feature has no test code, write the tests for it before validating or changing it.**
 - **When fixing a bug, first write a test that reproduces it (and fails)**, then fix the code.
-- **Every test is written with Pytest**, at every level. Files are named `test_*.py` and functions `test_*`. Use
-  fixtures, `parametrize` and plain `assert`. Never write `unittest.TestCase` classes; `unittest.mock` is allowed only
-  as a library of test doubles.
-- `pytest.toml` already adds `src` to the `pythonpath`, so import the package directly
-  (`from my_awesome_project import ...`).
+- **Every test is written with Pytest**, at every level. Files are named `test_*.py` and functions `test_*`. Use fixtures, `parametrize` and plain `assert`. Never write `unittest.TestCase` classes; `unittest.mock` is allowed only as a library of test doubles.
+- `pytest.toml` already adds `src` to the `pythonpath`, so import the package directly (`from my_awesome_project import ...`).
 
 ❌ Undesirable:
 
@@ -37,30 +32,25 @@ def test_money_addition_sums_the_amounts():
 
 ## 2. Keep the test coverage at 80% or more
 
-**The total test coverage must be at least 80%.** It is measured by
-[pytest-cov](https://pytest-cov.readthedocs.io) (branch coverage) and configured in `.coveragerc`
-(`fail_under = 80`), so `uv run poe test` fails when the coverage drops below the threshold.
+**The total test coverage must be at least 80%.** It is measured by [pytest-cov](https://pytest-cov.readthedocs.io) (branch coverage) and configured in `.coveragerc` (`fail_under = 80`), so `uv run poe test` fails when the coverage drops below the threshold.
 
 ```bash
 uv run poe test                           # All tests, failing below 80% coverage
 uv run pytest --cov --cov-report=html     # Coverage report in htmlcov/index.html
 ```
 
-Coverage is a floor, not a goal: a line executed by a test without meaningful assertions is not tested (see
-[Self-validating](#self-validating)).
+Coverage is a floor, not a goal: a line executed by a test without meaningful assertions is not tested (see [Self-validating](#self-validating)).
 
 ## 3. Focus the tests on what is most critical
 
-Spend the testing effort where a failure hurts the business the most. Critical behaviors (money, security, data
-integrity, the main user journeys) deserve every branch, edge case and error path covered, at more than one test level.
-Simple, low-risk behaviors need only their main cases.
+Spend the testing effort where a failure hurts the business the most. Critical behaviors (money, security, data integrity, the main user journeys) deserve every branch, edge case and error path covered, at more than one test level. Simple, low-risk behaviors need only their main cases.
 
 For example, a checkout is far more critical than registering a product category:
 
-| Behavior                   | Criticality | Expected tests                                                                  |
-| -------------------------- | ----------- | ------------------------------------------------------------------------------- |
+| Behavior                   | Criticality | Expected tests                                                                   |
+| -------------------------- | ----------- | -------------------------------------------------------------------------------- |
 | Checkout                   | High        | Totals, discounts, taxes, payment failures, retries, empty cart, stock, e2e flow |
-| Product category registry  | Low         | Creating a valid category and rejecting a duplicate name                        |
+| Product category registry  | Low         | Creating a valid category and rejecting a duplicate name                         |
 
 ## 4. Follow the FIRST principles
 
@@ -72,9 +62,7 @@ For example, a checkout is far more critical than registering a product category
 | **S**  | Self-validating | **High**                                                        |
 | **T**  | Timely          | Low — may be ignored (see [Timely](#timely-optional))           |
 
-Test doubles replace real dependencies to keep tests fast and repeatable. Thanks to the
-[Ports and Adapters](../skills/architecture-standards/SKILL.md#ports-and-adapters) architecture, they are plugged into the use cases
-through their constructors:
+Test doubles replace real dependencies to keep tests fast and repeatable. Thanks to the [Ports and Adapters](../skills/architecture-standards/SKILL.md#ports-and-adapters) architecture, they are plugged into the use cases through their constructors:
 
 | Double    | What it does                                                                    |
 | --------- | ------------------------------------------------------------------------------- |
@@ -86,8 +74,7 @@ through their constructors:
 
 ### Fast
 
-Tests must run fast, so they can be run all the time. Replace slow dependencies (network, external APIs, databases,
-sleeps) with stubs and fakes in unit tests; real infrastructure belongs only in integration and end-to-end tests.
+Tests must run fast, so they can be run all the time. Replace slow dependencies (network, external APIs, databases, sleeps) with stubs and fakes in unit tests; real infrastructure belongs only in integration and end-to-end tests.
 
 ❌ Undesirable — the unit test calls a real HTTP API, which is slow and may be unavailable:
 
@@ -114,9 +101,7 @@ def test_convert_price_applies_the_exchange_rate():
 
 ### Independent
 
-Tests must not depend on each other nor on their execution order. If a test relies on the state left by another one,
-a single failure breaks every test built on top of it, hiding the real cause. Create fresh state for each test with
-fixtures and never share mutable state between tests.
+Tests must not depend on each other nor on their execution order. If a test relies on the state left by another one, a single failure breaks every test built on top of it, hiding the real cause. Create fresh state for each test with fixtures and never share mutable state between tests.
 
 ❌ Undesirable — `test_pay_order` only passes if `test_add_order` runs first:
 
@@ -157,9 +142,7 @@ def test_paying_an_order_changes_its_status_to_paid(draft_order: Order):
 
 ### Repeatable
 
-Running a test many times, on any machine, at any date, must always give the same result. Never depend on the current
-date or time, randomness, the network or external APIs that may answer differently on each call. Inject those values
-(e.g. a `today` parameter or a clock port) and use mocks and stubs to control the answers of external services.
+Running a test many times, on any machine, at any date, must always give the same result. Never depend on the current date or time, randomness, the network or external APIs that may answer differently on each call. Inject those values (e.g. a `today` parameter or a clock port) and use mocks and stubs to control the answers of external services.
 
 ❌ Undesirable — `is_expired()` reads `date.today()`, so the test starts failing after November 30, 2026:
 
@@ -194,9 +177,7 @@ def test_checkout_charges_the_cart_once(user: User, cart: Cart):
 
 ### Self-validating
 
-A test must decide on its own whether it passed or failed, and **it must fail whenever the behavior breaks**. Coverage
-alone proves nothing: validate the inputs, the returned values, the state changes, the interactions and the raised
-exceptions with precise assertions. To check a test, break the code on purpose and confirm that the test fails.
+A test must decide on its own whether it passed or failed, and **it must fail whenever the behavior breaks**. Coverage alone proves nothing: validate the inputs, the returned values, the state changes, the interactions and the raised exceptions with precise assertions. To check a test, break the code on purpose and confirm that the test fails.
 
 ❌ Undesirable — the test executes the code but would pass with almost any implementation:
 
@@ -230,9 +211,7 @@ def test_apply_discount_rejects_a_missing_order():
 
 ### Timely (optional)
 
-Timely means imagining how the code and its API are expected to behave, and writing the tests for it, before
-implementing the function, method or class (as in TDD). **This principle may be ignored**: tests may be written in
-whatever order is most efficient for the LLM, as long as the behavior is fully covered before the task is finished.
+Timely means imagining how the code and its API are expected to behave, and writing the tests for it, before implementing the function, method or class (as in TDD). **This principle may be ignored**: tests may be written in whatever order is most efficient for the LLM, as long as the behavior is fully covered before the task is finished.
 
 ## 5. Structure each test with Arrange/Act/Assert (AAA)
 
@@ -244,9 +223,7 @@ Every test has three phases, in this order:
 | **Act**     | Execute the single behavior under test.              |
 | **Assert**  | Verify the result, the state changes or the calls.   |
 
-- Do not separate the phases with blank lines: test functions follow the
-  [no blank lines rule](code-standards.md#10-avoid-blank-lines-inside-function-and-method-bodies) like any other
-  function. Keep the phases in order and do not label them with comments.
+- Do not separate the phases with blank lines: test functions follow the [no blank lines rule](code-standards.md#10-avoid-blank-lines-inside-function-and-method-bodies) like any other function. Keep the phases in order and do not label them with comments.
 - Test one behavior per test, with a single Act phase.
 - Name the test after the behavior and its expected outcome, e.g. `test_paying_an_empty_order_is_rejected`.
 
@@ -281,14 +258,14 @@ def test_order_total_sums_the_line_subtotals():
 
 ## 6. Follow the test pyramid
 
-Have a wide base of unit tests, a middle layer of integration tests and a small top of end-to-end tests covering only
-the critical user journeys. Each level lives in its own folder inside `tests/`:
+Have a wide base of unit tests, a middle layer of integration tests and a small top of end-to-end tests covering only the critical user journeys. Each level lives in its own folder inside `tests/`:
 
-```text
+```mermaid
+treeView-beta
 tests/
-├── unit/          # Many tests: fast, isolated, no I/O
-├── integration/   # Fewer tests: adapters against real infrastructure
-└── e2e/           # Few tests: critical user journeys through the real entry points
+    unit/ ## Many tests: fast, isolated, no I/O
+    integration/ ## Fewer tests: adapters against real infrastructure
+    e2e/ ## Few tests: critical user journeys through the real entry points
 ```
 
 | Level           | Folder               | What it verifies                                                                                        | Speed  |
@@ -358,9 +335,7 @@ def test_saved_order_can_be_retrieved(connection: sqlite3.Connection):
 
 ### End-to-end test example (Playwright)
 
-End-to-end tests are preferably implemented with **[Playwright](https://playwright.dev/python/)** through the
-`pytest-playwright` plugin, which provides the `page` fixture to Pytest. Install it with
-`uv add --group dev pytest-playwright` and the browsers with `uv run playwright install`.
+End-to-end tests are preferably implemented with **[Playwright](https://playwright.dev/python/)** through the `pytest-playwright` plugin, which provides the `page` fixture to Pytest. Install it with `uv add --group dev pytest-playwright` and the browsers with `uv run playwright install`.
 
 `tests/e2e/test_checkout.py`:
 
@@ -381,8 +356,7 @@ def test_user_can_complete_checkout(page: Page):
     expect(page.get_by_text("Order placed successfully")).to_be_visible()
 ```
 
-Prefer user-facing locators (`get_by_role`, `get_by_label`, `get_by_text`) over CSS/XPath selectors, and Playwright's
-auto-waiting `expect` assertions over manual sleeps.
+Prefer user-facing locators (`get_by_role`, `get_by_label`, `get_by_text`) over CSS/XPath selectors, and Playwright's auto-waiting `expect` assertions over manual sleeps.
 
 ## 7. Running the tests
 

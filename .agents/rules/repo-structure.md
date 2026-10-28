@@ -1,98 +1,85 @@
 # Repository Structure
 
-Folder and file layout of this repository. It complements [`AGENTS.md`](../../AGENTS.md), and every agent must follow
-it when creating, moving or reviewing files. Keep this tree up to date whenever files or folders are added, renamed or
-removed.
+Folder and file layout of this repository. It complements [`AGENTS.md`](../../AGENTS.md), and every agent must follow it when creating, moving or reviewing files. Keep this tree up to date whenever files or folders are added, renamed or removed.
 
-```text
-.
-├── .agents/
-│   ├── rules/
-│   │   ├── code-standards.md           # Code conventions and Clean Code rules
-│   │   ├── commit-conventions.md       # Commit messages (Conventional Commits)
-│   │   ├── dev-environment.md          # uv dependency management, development tools and Poe the Poet tasks
-│   │   ├── repo-structure.md           # Folder and file layout (this file)
-│   │   ├── tests.md                    # Testing rules (coverage, FIRST, AAA, test pyramid)
-│   │   └── versioning.md               # Semantic Versioning and version bumps with uv
-│   └── skills/
-│       ├── architecture-standards/     # Clean Architecture, Ports and Adapters, DDD and SOLID (src/ only)
-│       │   └── SKILL.md
-│       └── wide-event-logging/         # Wide events with structlog saved to .jsonl files (Logging Sucks)
-│           ├── SKILL.md
-│           └── references/
-│               └── example.md          # Complete implementation and resulting .jsonl lines
-├── .claude/
-│   └── skills/
-│       ├── architecture-standards/
-│       │   └── SKILL.md                # Exposes the skill to Claude Code (auto-loaded for src/**/*.py)
-│       └── wide-event-logging/
-│           └── SKILL.md                # Exposes the skill to Claude Code; points to .agents/skills/
-├── .github/
-│   ├── FUNDING.yml                     # Sponsorship links shown on GitHub
-│   └── workflows/
-│       ├── publish-pypi.yml            # Build + publish to PyPI (when a release is published)
-│       └── publish-testpypi.yml        # Build + publish to TestPyPI (push to main)
-├── .vscode/
-│   └── extensions.json                 # Recommended VS Code extensions
-├── docs/                               # Technical documentation site (Zensical)
-│   ├── index.md                        # Documentation home page
-│   └── scripts/
-│       └── extra.js                    # Extra JavaScript loaded by the site
-├── src/                                # Python source code of the solution
-│   ├── main.py                         # Application entry point
-│   ├── my_awesome_project/             # Main package
-│   │   └── __init__.py
-│   └── py.typed                        # Marks the package as typed (PEP 561)
-├── tests/                              # Automated tests (Pytest)
-│   ├── unit/                           # Unit tests (fast, isolated, no I/O)
-│   │   ├── test_hello_world.py
-│   │   └── test_package.py
-│   ├── integration/                    # Integration tests (adapters against real infrastructure)
-│   │   └── .gitkeep
-│   └── e2e/                            # End-to-end tests (Playwright)
-│       └── .gitkeep
-├── .coveragerc                         # Coverage configuration (minimum of 80%)
-├── .gitignore                          # Files and folders ignored by Git
-├── .python-version                     # Python version used by uv
-├── .readthedocs.yaml                   # Documentation build on Read the Docs
-├── AGENTS.md                           # Instructions for AI agents (LLM-agnostic)
-├── CLAUDE.md                           # Points Claude Code to AGENTS.md
-├── LICENSE.md
-├── poe_tasks.toml                      # Poe the Poet tasks (task runner)
-├── pyproject.toml                      # Project metadata, dependencies and build backend (uv_build)
-├── pytest.toml                         # Pytest configuration
-├── README.md
-├── ruff.toml                           # Ruff configuration (linter/formatter)
-├── ty.toml                             # ty configuration (type checker)
-├── uv.lock                             # uv lockfile (versioned; never edit by hand)
-├── uv.toml                             # uv configuration (indexes, e.g. TestPyPI)
-└── zensical.toml                       # Documentation site configuration (Zensical)
+```mermaid
+treeView-beta
+    .agents/
+        rules/
+			code-standards.md ## Code conventions and Clean Code rules
+			commit-conventions.md ## Commit messages (Conventional Commits)
+			dev-environment.md ## uv dependency management, development tools and Poe the Poet tasks
+			repo-structure.md ## Folder and file layout (this file)
+			tests.md ## Testing rules (coverage, FIRST, AAA, test pyramid)
+			versioning.md ## Semantic Versioning and version bumps with uv
+		skills/
+            architecture-standards/ ## Clean Architecture, Ports and Adapters, DDD and SOLID (src/ only)
+                SKILL.md
+            changelog/ ## CHANGELOG.md with Keep a Changelog (only on version bumps)
+                SKILL.md
+            wide-event-logging/ ## Wide events with structlog saved to .jsonl files (Logging Sucks)
+                SKILL.md
+                references/
+                    example.md ## Complete implementation and resulting .jsonl lines
+	.claude/
+		skills/
+            architecture-standards/
+                SKILL.md ## Exposes the skill to Claude Code (auto-loaded for src/**/*.py)
+            changelog/
+                SKILL.md ## Exposes the skill to Claude Code; points to .agents/skills/
+            wide-event-logging/
+                SKILL.md ## Exposes the skill to Claude Code; points to .agents/skills/
+	.github/
+		FUNDING.yml ## Sponsorship links shown on GitHub
+		workflows/
+            publish-pypi.yml ## Build + publish to PyPI (when a release is published)
+            publish-testpypi.yml ## Build + publish to TestPyPI (push to main)
+	.vscode/
+		extensions.json ## Recommended VS Code extensions
+	docs/ ## Technical documentation site (Zensical)
+		index.md ## Documentation home page
+		scripts/
+            extra.js ## Extra JavaScript loaded by the site
+	src/ ## Python source code of the solution
+		main.py ## Application entry point
+		my_awesome_project/ ## Main package
+			__init__.py
+		py.typed ## Marks the package as typed (PEP 561)
+	tests/ ## Automated tests (Pytest)
+		unit/ ## Unit tests (fast, isolated, no I/O)
+			test_hello_world.py
+			test_package.py
+		integration/ ## Integration tests (adapters against real infrastructure)
+			.gitkeep
+		e2e/ ## End-to-end tests (Playwright)
+            .gitkeep
+	.coveragerc ## Coverage configuration (minimum of 80%)
+	.gitignore ## Files and folders ignored by Git
+	.python-version ## Python version used by uv
+	.readthedocs.yaml ## Documentation build on Read the Docs
+	AGENTS.md ## Instructions for AI agents (LLM-agnostic)
+	CHANGELOG.md ## Notable changes per version (Keep a Changelog)
+	CLAUDE.md ## Points Claude Code to AGENTS.md
+	LICENSE.md
+	poe_tasks.toml ## Poe the Poet tasks (task runner)
+	pyproject.toml ## Project metadata, dependencies and build backend (uv_build)
+	pytest.toml ## Pytest configuration
+	README.md
+	ruff.toml ## Ruff configuration (linter/formatter)
+	ty.toml ## ty configuration (type checker)
+	uv.lock ## uv lockfile (versioned; never edit by hand)
+	uv.toml ## uv configuration (indexes, e.g. TestPyPI)
+	zensical.toml ## Documentation site configuration (Zensical)
 ```
 
-Generated folders such as `.venv/`, `dist/`, `docs/_build/`, `htmlcov/`, `logs/` (wide events persisted as `.jsonl`
-files) and the tool caches (`.pytest_cache/`, `.ruff_cache/`, `.coverage`) are ignored by Git and are not part of the
-structure.
+Generated folders such as `.venv/`, `dist/`, `docs/_build/`, `htmlcov/`, `logs/` (wide events persisted as `.jsonl` files) and the tool caches (`.pytest_cache/`, `.ruff_cache/`, `.coverage`) are ignored by Git and are not part of the structure.
 
 ## Role of each folder
 
-- **`src/`** — The whole Python solution lives here (`src` layout). New modules go inside the
-  `src/my_awesome_project/` package, organized according to the
-  [`architecture-standards`](../skills/architecture-standards/SKILL.md) skill.
-- **`tests/`** — Automated tests, **always written with Pytest** (never `unittest`), split into `unit/`,
-  `integration/` and `e2e/`. See the [testing](../../AGENTS.md#automated-tests) section and
-  [`tests.md`](tests.md). The `.gitkeep` files only keep the empty folders in Git; remove them once the folder
-  has real tests.
-- **`docs/`** — Technical documentation site, built with **Zensical** (the successor of MkDocs, which has been
-  discontinued). Do not use MkDocs or `mkdocs.yml`; all configuration lives in `zensical.toml`. The API reference is
-  generated by `mkdocstrings` from docstrings (**Google** style). The build output goes to `docs/_build/` (not
-  versioned).
-- **`.agents/rules/`** — Detailed rules for AI agents, linked from `AGENTS.md`. Add new rule files here instead of
-  growing `AGENTS.md`.
-- **`.agents/skills/`** — LLM-agnostic skills (`<skill-name>/SKILL.md`, in the
-  [Agent Skills](https://agentskills.io/) format), loaded on demand when the task matches their description. Long
-  examples go in a `references/` folder inside the skill.
-- **`.claude/skills/`** — Thin wrappers that expose each skill of `.agents/skills/` to Claude Code. They only repeat
-  the frontmatter and point to the real skill; never duplicate the skill content here.
-- **Root `*.toml` files** — Each development tool has its own dedicated configuration file (`ruff.toml`, `ty.toml`,
-  `pytest.toml`, `uv.toml`, `poe_tasks.toml`, `zensical.toml`). Keep this pattern: do **not** move tool configuration
-  into `[tool.*]` sections of `pyproject.toml`, which is reserved for metadata, dependencies and build settings.
+- **`src/`** — The whole Python solution lives here (`src` layout). New modules go inside the `src/my_awesome_project/` package, organized according to the [`architecture-standards`](../skills/architecture-standards/SKILL.md) skill.
+- **`tests/`** — Automated tests, **always written with Pytest** (never `unittest`), split into `unit/`, `integration/` and `e2e/`. See the [testing](../../AGENTS.md#automated-tests) section and [`tests.md`](tests.md). The `.gitkeep` files only keep the empty folders in Git; remove them once the folder has real tests.
+- **`docs/`** — Technical documentation site, built with **Zensical** (the successor of MkDocs, which has been discontinued). Do not use MkDocs or `mkdocs.yml`; all configuration lives in `zensical.toml`. The API reference is generated by `mkdocstrings` from docstrings (**Google** style). The build output goes to `docs/_build/` (not versioned).
+- **`.agents/rules/`** — Detailed rules for AI agents, linked from `AGENTS.md`. Add new rule files here instead of growing `AGENTS.md`.
+- **`.agents/skills/`** — LLM-agnostic skills (`<skill-name>/SKILL.md`, in the [Agent Skills](https://agentskills.io/) format), loaded on demand when the task matches their description. Long examples go in a `references/` folder inside the skill.
+- **`.claude/skills/`** — Thin wrappers that expose each skill of `.agents/skills/` to Claude Code. They only repeat the frontmatter and point to the real skill; never duplicate the skill content here.
+- **Root `*.toml` files** — Each development tool has its own dedicated configuration file (`ruff.toml`, `ty.toml`, `pytest.toml`, `uv.toml`, `poe_tasks.toml`, `zensical.toml`). Keep this pattern: do **not** move tool configuration into `[tool.*]` sections of `pyproject.toml`, which is reserved for metadata, dependencies and build settings.

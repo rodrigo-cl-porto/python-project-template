@@ -1,13 +1,10 @@
 # Development Environment
 
-Development environment setup of this repository: dependency management with uv, the development tools and the Poe the
-Poet tasks. It complements [`AGENTS.md`](../../AGENTS.md), and every agent must follow it when installing, adding,
-removing or upgrading dependencies, and when running the development tools.
+Development environment setup of this repository: dependency management with uv, the development tools and the Poe the Poet tasks. It complements [`AGENTS.md`](../../AGENTS.md), and every agent must follow it when installing, adding, removing or upgrading dependencies, and when running the development tools.
 
 ## Dependency management: uv
 
-Dependencies and environments are managed **exclusively with [uv](https://docs.astral.sh/uv/)** by Astral. **Never**
-use `pip`, `pip install`, `requirements.txt`, `poetry` or `conda`.
+Dependencies and environments are managed **exclusively with [uv](https://docs.astral.sh/uv/)** by Astral. **Never** use `pip`, `pip install`, `requirements.txt`, `poetry` or `conda`.
 
 | Action                           | Command                                                    |
 | -------------------------------- | ---------------------------------------------------------- |
@@ -27,8 +24,7 @@ Dependency groups defined in `pyproject.toml`:
 - `dev` — `poethepoet`, `pytest`, `pytest-cov`, `ruff`, `ty`.
 - `docs` — `zensical`, `mkdocstrings`.
 
-When changing dependencies, use uv commands (which update `pyproject.toml` and `uv.lock` together) instead of editing
-those files by hand.
+When changing dependencies, use uv commands (which update `pyproject.toml` and `uv.lock` together) instead of editing those files by hand.
 
 ## Development tools
 
