@@ -1,11 +1,7 @@
 ---
 name: architecture-standards
 description: >-
-  Architectural patterns and design principles of this repository: Clean Architecture, Ports and Adapters
-  (Hexagonal Architecture), Domain-Driven Design and SOLID, with the recommended package layout, the Dependency Rule
-  (adapters -> application -> domain), ports defined with typing.Protocol and dependency injection through the
-  constructor. Always use before creating, modifying, designing or reviewing any file inside the src/ folder. Do not
-  use for changes outside src/ or for changes that touch only Markdown files.
+    Architectural patterns and design principles of this repository: Clean Architecture, Ports and Adapters (Hexagonal Architecture), Domain-Driven Design and SOLID, with the recommended package layout, the Dependency Rule (adapters -> application -> domain), ports defined with typing.Protocol and dependency injection through the constructor. Always use before creating, modifying, designing or reviewing any file inside the src/ folder. Do not use for changes outside src/ or for changes that touch only Markdown files.
 ---
 
 # Architecture Standards
@@ -43,7 +39,6 @@ graph TB
 ```
 
 Each layer is fully contained in the layer around it, and every arrow (a source code dependency) points inwards: from the adapters to the application and the domain, and from the application to the domain. No arrow ever leaves an inner layer towards an outer one.
-
 
 Why this matters:
 
@@ -102,8 +97,9 @@ from dataclasses import dataclass
 class Order:
     order_id: str
     total: float
+```
 
-
+```python
 # application/ports.py
 from typing import Protocol
 
@@ -113,8 +109,9 @@ from my_awesome_project.domain.models import Order
 class OrderRepository(Protocol):
     def add(self, order: Order) -> None: ...
     def get(self, order_id: str) -> Order | None: ...
+```
 
-
+```python
 # adapters/outbound/sqlite_order_repository.py
 import sqlite3
 

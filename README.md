@@ -199,7 +199,6 @@ treeView-beta
   📜 AGENTS.md ## Instructions for AI agents
   🐍 pyproject.toml :::logos(python) ## Metadata, dependencies and build backend
   ⚙️ *.toml ## One configuration file per tool
-
 ```
 
 The complete, annotated tree lives in [`.agents/rules/repo-structure.md`](.agents/rules/repo-structure.md).
