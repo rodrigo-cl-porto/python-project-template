@@ -1,7 +1,6 @@
 {
   "recommendations": [
     "bierner.github-markdown-preview",
-    "bradlc.vscode-tailwindcss",
     "charliermarsh.ruff",
     "dracula-theme.theme-dracula",
     "esbenp.prettier-vscode",

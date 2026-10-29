@@ -175,23 +175,31 @@ Publishing tasks read the tokens from a local `.env` file, which is ignored by G
 ## Repository structure
 
 ```mermaid
+---
+config:
+  themeVariables:
+    treeView:
+      labelFontSize: '11pt'
+      labelColor: '#bd8944'
+      lineColor: '#afa5816b'
+---
 treeView-beta
-  .agents/ ## Rules and skills for AI agents (LLM-agnostic)
-  .claude/ ## Exposes the agent skills to Claude Code
-  .github/workflows/ ## Publishing to TestPyPI and PyPI
-  .vscode/ ## Recommended VS Code extensions
-  docs/ ## Documentation site (Zensical)
-  src/
-    main.py ## Application entry point
-    my_awesome_project/ ## Main package
-    py.typed ## Marks the package as typed (PEP 561)
-  tests/
-    unit/ ## Fast, isolated tests without I/O
-    integration/ ## Adapters against real infrastructure
-    e2e/ ## Critical user journeys (Playwright)
-  AGENTS.md ## Instructions for AI agents
-  pyproject.toml ## Metadata, dependencies and build backend
-  *.toml ## One configuration file per tool
+  🤖 .agents/ ## Rules and skills for AI agents (LLM-agnostic)
+  🐙 .github/workflows/ ## Publishing to TestPyPI and PyPI
+  💻 .vscode/ ## Recommended VS Code extensions
+  📚 docs/ ## Documentation site (Zensical)
+  📂 src/
+    🚀 main.py ## Application entry point
+    📦 my_awesome_project/ ## Main package
+    🏷️ py.typed ## Marks the package as typed (PEP 561)
+  🧪 tests/
+    🧩 unit/ ## Fast, isolated tests without I/O
+    🔌 integration/ ## Adapters against real infrastructure
+    🌐 e2e/ ## Critical user journeys (Playwright)
+  📜 AGENTS.md ## Instructions for AI agents
+  🐍 pyproject.toml :::logos(python) ## Metadata, dependencies and build backend
+  ⚙️ *.toml ## One configuration file per tool
+
 ```
 
 The complete, annotated tree lives in [`.agents/rules/repo-structure.md`](.agents/rules/repo-structure.md).
