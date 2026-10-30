@@ -184,7 +184,7 @@ def configure_application() -> None:
     configure_logging()
 ```
 
-### `application/use_cases.py`
+### `application/use_cases/checkout.py`
 
 The use case enriches the current event, including the interaction with the external payment service:
 
@@ -286,7 +286,7 @@ On failure, pointing to the method that raised the error:
 {
   "event": "checkout", "level": "info", "timestamp": "2026-01-15T10:24:02.118+00:00",
   "origin": {
-    "file": "my_awesome_project/adapters/outbound/stripe_payment_gateway.py",
+    "file": "my_awesome_project/adapters/outbound/payment_gateways/stripe_payment_gateway.py",
     "function": "StripePaymentGateway.charge"
   },
   "operation": "checkout", "request_id": "1c9e4a7b-...", "service": "my-awesome-project", "version": "1.4.0",
@@ -301,5 +301,5 @@ What the file actually contains (one event per line):
 
 ```jsonl
 {"event": "checkout", "level": "info", "timestamp": "2026-01-15T10:23:44.365+00:00", "origin": {"file": "my_awesome_project/adapters/inbound/cli.py", "function": "checkout_command"}, "outcome": "success", "...": "..."}
-{"event": "checkout", "level": "info", "timestamp": "2026-01-15T10:24:02.118+00:00", "origin": {"file": "my_awesome_project/adapters/outbound/stripe_payment_gateway.py", "function": "StripePaymentGateway.charge"}, "outcome": "error", "...": "..."}
+{"event": "checkout", "level": "info", "timestamp": "2026-01-15T10:24:02.118+00:00", "origin": {"file": "my_awesome_project/adapters/outbound/payment_gateways/stripe_payment_gateway.py", "function": "StripePaymentGateway.charge"}, "outcome": "error", "...": "..."}
 ```

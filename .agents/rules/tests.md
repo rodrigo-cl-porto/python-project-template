@@ -283,7 +283,7 @@ from decimal import Decimal
 
 import pytest
 
-from my_awesome_project.domain.exceptions import InvalidMoneyError
+from my_awesome_project.domain.exceptions.invalid_money_error import InvalidMoneyError
 from my_awesome_project.domain.money import Money
 
 
@@ -315,7 +315,7 @@ from pathlib import Path
 
 import pytest
 
-from my_awesome_project.adapters.outbound.sqlite_order_repository import SqliteOrderRepository
+from my_awesome_project.adapters.outbound.repositories.sqlite_order_repository import SqliteOrderRepository
 from my_awesome_project.domain.order import Order
 
 

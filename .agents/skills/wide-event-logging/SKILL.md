@@ -65,7 +65,7 @@ Every wide event must contain:
 | `outcome`                     | `success` or `error`.                                                                    |
 | `error`                       | Only on failure: an object with `type`, `message`, `code` and `retriable`.               |
 
-For example: `"timestamp": "2026-01-15T10:23:44.365+00:00"` and `"origin": {"file": "my_awesome_project/application/use_cases.py", "function": "Checkout.execute"}`.
+For example: `"timestamp": "2026-01-15T10:23:44.365+00:00"` and `"origin": {"file": "my_awesome_project/application/use_cases/checkout.py", "function": "Checkout.execute"}`.
 
 The **main event** is what defines the outcome of the unit of work:
 

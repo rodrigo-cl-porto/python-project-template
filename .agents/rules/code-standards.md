@@ -4,6 +4,7 @@ Coding conventions and Clean Code rules for this repository. They complement [`A
 
 ## Code conventions
 
+- **Object-oriented programming is the predominant paradigm** (see [rule 5](#5-use-object-oriented-programming-as-the-predominant-paradigm)), and every `.py` file of the application core holds **a single class** (see [rule 14](#14-write-one-class-per-file-and-group-related-classes-in-folders)).
 - Write code compatible with Python 3.13+ and use modern syntax (`list[int]`, `X | None`, `type` aliases, etc.).
 - **Annotate types** on every function and method in `src/` (the package is typed — `py.typed`).
 - Write **Google-style docstrings**; they feed the documentation through `mkdocstrings`.
@@ -315,9 +316,9 @@ def read_commands(reader: CommandReader) -> list[Command]:
     return commands
 ```
 
-### 5. Prefer classes to group related logic and state
+### 5. Use object-oriented programming as the predominant paradigm
 
-When several functions operate on the same data, or pass the same arguments around, group them in a class. Use `dataclasses` for data-centric objects.
+**Object-oriented programming (OOP) is the predominant paradigm of this software.** Model the solution as classes that own their state and the logic that operates on it, instead of loose functions that pass the same data around. When several functions operate on the same data, or pass the same arguments around, they belong together as methods of a class. Use `dataclasses` for data-centric objects. Module-level functions are the exception, reserved for places with no state or behavior to encapsulate, such as the composition root (`bootstrap.py`), the entry point (`main.py`) and small stateless decorators. Each class lives in its own file (see [rule 14](#14-write-one-class-per-file-and-group-related-classes-in-folders)).
 
 ❌ Undesirable:
 
@@ -481,7 +482,7 @@ SEMANTIC_VERSION_PATTERN: Final = re.compile(
 
 ### 9. Never write large files or classes
 
-**A `.py` file (and therefore any class in it) must have at most 100 lines.** It is preferable to split the code into several small, cohesive modules than to write one giant piece of logic in a single file. When a file approaches the limit, extract classes, functions or value objects into their own modules.
+**A `.py` file (and therefore any class in it) must have at most 100 lines.** It is preferable to split the code into several small, cohesive modules than to write one giant piece of logic in a single file. When a file approaches the limit, extract classes, functions or value objects into their own modules. Since every file of the application core holds a single class (see [rule 14](#14-write-one-class-per-file-and-group-related-classes-in-folders)), a class that approaches the limit is doing too much and must be split into smaller collaborating classes.
 
 ❌ Undesirable:
 
@@ -628,3 +629,70 @@ class Settings(BaseSettings):
 settings = Settings()
 client = PaymentClient(api_key=settings.payment_api_key.get_secret_value())
 ```
+
+### 14. Write one class per file and group related classes in folders
+
+**Each `.py` file of the application core (every module of the `src/my_awesome_project/` package) holds a single class, with all of its logic organized in its body. This applies even to small classes**: value objects, enums, exceptions, protocols (ports) and adapters each get their own file. Modules that define no class at all, such as `__init__.py`, the composition root (`bootstrap.py`) and the entry point (`main.py`), are not affected.
+
+- **Classes of the same family still go in separate files.** A port and each of its implementations (e.g. `OrderRepository`, `InMemoryOrderRepository`, `SqliteOrderRepository`, `ParquetOrderRepository`) are closely related, but each one is written in its own file.
+- **Express the relationship between classes with folders, not with a shared file.** Save the files of a family in the same folder, named after the family in the plural (e.g. `repositories/`, `exceptions/`, `use_cases/`). A folder of small files is preferable to one giant file.
+- **Name each file after its class in `snake_case`**: `SqliteOrderRepository` lives in `sqlite_order_repository.py`, so the file of any class can be found from its name alone.
+- The family folders still respect the layers of the [`architecture-standards`](../skills/architecture-standards/SKILL.md) skill: the port lives in `application/ports/` and its implementations in `adapters/outbound/`.
+
+❌ Undesirable — a whole family of classes in a single file:
+
+```python
+# adapters/outbound/repositories.py
+class InMemoryOrderRepository:
+    def __init__(self) -> None:
+        self._orders: dict[str, Order] = {}
+
+    def add(self, order: Order) -> None:
+        self._orders[order.order_id] = order
+
+
+class SqliteOrderRepository:
+    def __init__(self, connection: sqlite3.Connection) -> None:
+        self._connection = connection
+
+    def add(self, order: Order) -> None:
+        self._connection.execute("INSERT INTO orders VALUES (?, ?)", (order.order_id, order.total))
+
+
+class ParquetOrderRepository:
+    def __init__(self, directory: Path) -> None:
+        self._directory = directory
+
+    def add(self, order: Order) -> None:
+        ...
+```
+
+✅ Fixed — one class per file, with the family grouped in a folder:
+
+```mermaid
+treeView-beta
+src/my_awesome_project/
+    application/
+        ports/
+            order_repository.py ## OrderRepository (Protocol)
+    adapters/
+        outbound/
+            repositories/
+                in_memory_order_repository.py ## InMemoryOrderRepository
+                sqlite_order_repository.py ## SqliteOrderRepository
+                parquet_order_repository.py ## ParquetOrderRepository
+```
+
+```python
+# adapters/outbound/repositories/sqlite_order_repository.py
+import sqlite3
+
+from my_awesome_project.domain.order import Order
+
+
+class SqliteOrderRepository:
+    def __init__(self, connection: sqlite3.Connection) -> None:
+        self._connection = connection
+
+    def add(self, order: Order) -> None:
+        self._connection.execute("INSERT INTO orders VALUES (?, ?)", (order.order_id, order.total))

@@ -221,7 +221,3 @@ __marimo__/
 
 # Wide event logs (.jsonl files written by the application)
 logs/
-
-# Claude config
-.claude
-CLAUDE.md

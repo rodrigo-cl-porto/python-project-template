@@ -1,7 +1,7 @@
 ---
 name: architecture-standards
 description: >-
-    Architectural patterns and design principles of this repository: Clean Architecture, Ports and Adapters (Hexagonal Architecture), Domain-Driven Design and SOLID, with the recommended package layout, the Dependency Rule (adapters -> application -> domain), ports defined with typing.Protocol and dependency injection through the constructor. Always use before creating, modifying, designing or reviewing any file inside the src/ folder. Do not use for changes outside src/ or for changes that touch only Markdown files.
+    Architectural patterns and design principles of this repository: Clean Architecture, Ports and Adapters (Hexagonal Architecture), Domain-Driven Design and SOLID, with object-oriented programming as the predominant paradigm, one class per file grouped in family folders, the recommended package layout, the Dependency Rule (adapters -> application -> domain), ports defined with typing.Protocol and dependency injection through the constructor. Always use before creating, modifying, designing or reviewing any file inside the src/ folder. Do not use for changes outside src/ or for changes that touch only Markdown files.
 ---
 
 # Architecture Standards
@@ -9,6 +9,8 @@ description: >-
 Architectural patterns and design principles of this repository. They complement [`AGENTS.md`](../../../AGENTS.md) and [`code-standards.md`](../../rules/code-standards.md), and every agent must follow them when designing, writing or reviewing code inside `src/`.
 
 The preferred architectural patterns are **Clean Architecture**, **Ports and Adapters (Hexagonal Architecture)** and **Domain-Driven Design (DDD)**. They complement each other: DDD models the business, Ports and Adapters isolates the business from technology, and Clean Architecture defines the dependency direction between layers.
+
+**Object-oriented programming is the predominant paradigm**: entities, value objects, ports, use cases and adapters are all classes, and **each `.py` file holds a single class**, even a small one (see [One class per file](#one-class-per-file)).
 
 ## Why these architectures
 
@@ -55,18 +57,41 @@ When the inner layer needs something that lives outside it (persisting data, sen
 treeView-beta
 src/my_awesome_project/
     domain/ ## Enterprise business rules (DDD): entities, value objects, aggregates, domain services, domain events and domain exceptions. Pure Python, no I/O.
-        models.py
-        exceptions.py
+        money.py ## Money (value object)
+        order.py ## Order (aggregate root)
+        order_line.py ## OrderLine (value object)
+        order_status.py ## OrderStatus (enum)
+        exceptions/ ## One file per domain exception.
+            empty_order_error.py ## EmptyOrderError
+            invalid_money_error.py ## InvalidMoneyError
     application/ ## Application business rules: use cases and ports (interfaces).
-        ports.py ## Abstract interfaces (typing.Protocol) the use cases depend on.
-        use_cases.py
+        ports/ ## Abstract interfaces (typing.Protocol) the use cases depend on, one per file.
+            notifier.py ## Notifier
+            order_repository.py ## OrderRepository
+        use_cases/ ## One file per use case.
+            cancel_order.py ## CancelOrder
+            place_order.py ## PlaceOrder
     adapters/ ## Concrete implementations of the ports.
         inbound/ ## Driving adapters: CLI, REST API, message consumers.
         outbound/ ## Driven adapters: databases, HTTP clients, email, file system.
+            notifiers/
+                smtp_notifier.py ## SmtpNotifier
+            repositories/ ## Every implementation of OrderRepository, one per file.
+                in_memory_order_repository.py ## InMemoryOrderRepository
+                parquet_order_repository.py ## ParquetOrderRepository
+                sqlite_order_repository.py ## SqliteOrderRepository
         code_origin.py ## File and function where the main event of a wide event occurred.
         observability.py ## structlog configuration and wide event helpers.
     bootstrap.py ## Composition root: wires adapters into use cases.
 ```
+
+## One class per file
+
+Object-oriented programming is the predominant paradigm, and **every `.py` file of the application core holds a single class**, with all of its logic in its body (see [rule 14 of `code-standards.md`](../../rules/code-standards.md#14-write-one-class-per-file-and-group-related-classes-in-folders)). This applies even to small classes, such as value objects, enums, exceptions and ports.
+
+- **Classes of the same family go in separate files inside a folder named after the family**, never together in one file. The `OrderRepository` port, `InMemoryOrderRepository`, `SqliteOrderRepository` and `ParquetOrderRepository` are four files, not one.
+- **Folders never break the Dependency Rule.** A family whose members live in different layers is split by layer: the port goes to `application/ports/` and its implementations to a family folder in `adapters/outbound/` (e.g. `adapters/outbound/repositories/`).
+- **Name each file after its class in `snake_case`** (`PlaceOrder` → `place_order.py`), and import the class from its own module (`from my_awesome_project.application.use_cases.place_order import PlaceOrder`).
 
 ## The Dependency Rule
 
@@ -75,7 +100,7 @@ Dependencies always point **inwards**: `adapters → application → domain`. Th
 ❌ Undesirable — business rule coupled to the database and to a framework:
 
 ```python
-# domain/models.py
+# domain/order.py
 import sqlite3
 
 
@@ -89,7 +114,7 @@ class Order:
 ✅ Fixed — the domain is pure; persistence is behind a port implemented by an adapter:
 
 ```python
-# domain/models.py
+# domain/order.py
 from dataclasses import dataclass
 
 
@@ -100,10 +125,10 @@ class Order:
 ```
 
 ```python
-# application/ports.py
+# application/ports/order_repository.py
 from typing import Protocol
 
-from my_awesome_project.domain.models import Order
+from my_awesome_project.domain.order import Order
 
 
 class OrderRepository(Protocol):
@@ -112,10 +137,10 @@ class OrderRepository(Protocol):
 ```
 
 ```python
-# adapters/outbound/sqlite_order_repository.py
+# adapters/outbound/repositories/sqlite_order_repository.py
 import sqlite3
 
-from my_awesome_project.domain.models import Order
+from my_awesome_project.domain.order import Order
 
 
 class SqliteOrderRepository:
@@ -177,13 +202,13 @@ class Invoice:
         return sum((line.subtotal for line in self.lines), start=Money(Decimal(0)))
 
 
-# adapters/outbound/pdf_invoice_renderer.py
+# adapters/outbound/renderers/pdf_invoice_renderer.py
 class PdfInvoiceRenderer:
     def render(self, invoice: Invoice) -> bytes:
         return PdfDocument(title=f"Invoice {invoice.invoice_id}", lines=invoice.lines).to_bytes()
 
 
-# adapters/outbound/sqlite_invoice_repository.py
+# adapters/outbound/repositories/sqlite_invoice_repository.py
 class SqliteInvoiceRepository:
     def __init__(self, connection: sqlite3.Connection) -> None:
         self._connection = connection
@@ -207,13 +232,15 @@ def calculate_discount(customer: Customer, total: Money) -> Money:
     return Money(Decimal(0))
 ```
 
-✅ Fixed — each policy is a class behind a common protocol; adding a tier never touches the existing policies:
+✅ Fixed — each policy is a class, in its own file, behind a common protocol; adding a tier means adding a new file and never touches the existing policies:
 
 ```python
+# domain/discount_policies/discount_policy.py
 class DiscountPolicy(Protocol):
     def discount_for(self, total: Money) -> Money: ...
 
 
+# domain/discount_policies/percentage_discount.py
 @dataclass(frozen=True)
 class PercentageDiscount:
     rate: Decimal
@@ -222,20 +249,19 @@ class PercentageDiscount:
         return total * self.rate
 
 
+# domain/discount_policies/no_discount.py
 class NoDiscount:
     def discount_for(self, total: Money) -> Money:
         return Money(Decimal(0), total.currency)
 
 
-DISCOUNT_POLICY_BY_TIER: Final[dict[CustomerTier, DiscountPolicy]] = {
-    CustomerTier.STANDARD: NoDiscount(),
-    CustomerTier.GOLD: PercentageDiscount(Decimal("0.10")),
-    CustomerTier.PLATINUM: PercentageDiscount(Decimal("0.20")),
-}
+# domain/discount_calculator.py
+class DiscountCalculator:
+    def __init__(self, policy_by_tier: Mapping[CustomerTier, DiscountPolicy]) -> None:
+        self._policy_by_tier = policy_by_tier
 
-
-def calculate_discount(customer: Customer, total: Money) -> Money:
-    return DISCOUNT_POLICY_BY_TIER[customer.tier].discount_for(total)
+    def calculate(self, customer: Customer, total: Money) -> Money:
+        return self._policy_by_tier[customer.tier].discount_for(total)
 ```
 
 ### L — Liskov Substitution Principle
@@ -297,14 +323,17 @@ class GenerateSalesReport:
 ✅ Fixed — each use case depends only on the role it needs; a single adapter may still implement several ports:
 
 ```python
+# application/ports/paid_order_reader.py
 class PaidOrderReader(Protocol):
     def list_paid(self) -> list[Order]: ...
 
 
+# application/ports/order_writer.py
 class OrderWriter(Protocol):
     def add(self, order: Order) -> None: ...
 
 
+# application/use_cases/generate_sales_report.py
 class GenerateSalesReport:
     def __init__(self, orders: PaidOrderReader) -> None:
         self._orders = orders
@@ -317,7 +346,7 @@ High-level modules (use cases, domain) must not depend on low-level modules (dat
 ❌ Undesirable — the use case imports and builds a concrete adapter, so it cannot run without a real SMTP server:
 
 ```python
-from my_awesome_project.adapters.outbound.smtp_notifier import SmtpNotifier
+from my_awesome_project.adapters.outbound.notifiers.smtp_notifier import SmtpNotifier
 
 
 class CancelOrder:
@@ -329,12 +358,12 @@ class CancelOrder:
 ✅ Fixed — the use case depends on a port; the concrete adapter is chosen in `bootstrap.py`:
 
 ```python
-# application/ports.py
+# application/ports/notifier.py
 class Notifier(Protocol):
     def send(self, message: str) -> None: ...
 
 
-# application/use_cases.py
+# application/use_cases/cancel_order.py
 class CancelOrder:
     def __init__(self, notifier: Notifier) -> None:
         self._notifier = notifier
@@ -369,12 +398,12 @@ class PlaceOrder:
 ✅ Fixed — dependencies are injected as ports:
 
 ```python
-# application/ports.py
+# application/ports/notifier.py
 class Notifier(Protocol):
     def send(self, message: str) -> None: ...
 
 
-# application/use_cases.py
+# application/use_cases/place_order.py
 class PlaceOrder:
     def __init__(self, repository: OrderRepository, notifier: Notifier) -> None:
         self._repository = repository
@@ -447,14 +476,10 @@ order.total += -10.0
 order.status = "paid"
 ```
 
-✅ Fixed — rich model; value objects and an aggregate root protect the invariants:
+✅ Fixed — rich model; value objects and an aggregate root protect the invariants, each class in its own file:
 
 ```python
-from dataclasses import dataclass, field
-from decimal import Decimal
-from enum import StrEnum
-
-
+# domain/money.py
 @dataclass(frozen=True)
 class Money:
     amount: Decimal
@@ -475,6 +500,7 @@ class Money:
         return Money(self.amount * factor, self.currency)
 
 
+# domain/order_line.py
 @dataclass(frozen=True)
 class OrderLine:
     product_id: str
@@ -486,11 +512,13 @@ class OrderLine:
         return self.unit_price * self.quantity
 
 
+# domain/order_status.py
 class OrderStatus(StrEnum):
     DRAFT = "draft"
     PAID = "paid"
 
 
+# domain/order.py
 @dataclass
 class Order:  # Aggregate root
     order_id: str

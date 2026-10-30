@@ -152,6 +152,9 @@ Besides the frameworks, the repository comes with ready-to-use integrations:
 - **Instructions for AI agents** (`AGENTS.md`, `.agents/` and `.claude/`): LLM-agnostic rules and skills that teach AI
   coding assistants the conventions of the repository (see [Conventions](#conventions)).
 
+> [!NOTE]
+> Although this repository is agnostic to the LLM model, it includes Claude-specific files (`CLAUDE.md` and `.claude/`) only to show how the Markdown files should be used when an LLM requires its own specific files in order to be used. `CLAUDE.md` just points to `AGENTS.md`, and each `.claude/skills/<skill-name>/SKILL.md` only repeats the frontmatter and points to the real skill in `.agents/skills/`, so the instructions are never duplicated. Follow the same pattern for any other LLM that requires its own files.
+
 ## Available tasks
 
 Run any task with `uv run poe <task>`:
