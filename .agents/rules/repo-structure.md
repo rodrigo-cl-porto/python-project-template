@@ -14,6 +14,7 @@ treeView-beta
 			code-standards.md ## Code conventions and Clean Code rules
 			commit-conventions.md ## Commit messages (Conventional Commits)
 			dev-environment.md ## uv dependency management, development tools and Poe the Poet tasks
+			markdown-standards.md ## Markdown conventions (no hard wrap, Mermaid diagrams and trees)
 			repo-structure.md ## Folder and file layout (this file)
 			tests.md ## Testing rules (coverage, FIRST, AAA, test pyramid)
 			versioning.md ## Semantic Versioning and version bumps with uv

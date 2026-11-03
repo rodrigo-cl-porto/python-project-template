@@ -1,9 +1,8 @@
 ---
 name: code-standards
-description: Code conventions, Markdown conventions and Clean Code rules of this repository (object-oriented programming, one class per file grouped in family folders, Python 3.13+ syntax, mandatory type annotations, Google-style docstrings, Ruff rules, no magic numbers, small functions, guard clauses, no comments, Mermaid diagrams, no hard-wrapped Markdown). Read before writing or reviewing any Python code or Markdown file.
+description: Code conventions and Clean Code rules of this repository (object-oriented programming, one class per file grouped in family folders, Python 3.13+ syntax, mandatory type annotations, Google-style docstrings, Ruff rules, no magic numbers, small functions, guard clauses, no comments). Read before writing or reviewing any Python code.
 paths:
   - "**/*.py"
-  - "**/*.md"
 ---
 
 # Code Standards
@@ -17,68 +16,6 @@ Coding conventions and Clean Code rules for this repository. They complement [`A
 - **Annotate types** on every function and method in `src/` (the package is typed — `py.typed`).
 - Write **Google-style docstrings**; they feed the documentation through `mkdocstrings`.
 - Follow the configured Ruff rules; do not disable rules without a justified need.
-
-## Markdown conventions
-
-- **Do not hard-wrap paragraphs** in Markdown files (`AGENTS.md`, `README.md`, `CHANGELOG.md`, `docs/`, rules and skills). Write each paragraph, list item and blockquote on a single line, however long: editors and IDEs soft-wrap long lines in the UI, and the rendered output is the same. The 120-character limit applies to Python code only (Ruff), not to Markdown prose.
-- Line breaks still matter where Markdown requires them: code blocks, tables, directory trees and nested list items keep their own lines.
-
-❌ Undesirable:
-
-```markdown
-Every commit message follows Conventional Commits. The file defines the allowed types
-and their SemVer impact and the rules for scope, description, body, footers and
-breaking changes.
-```
-
-✅ Fixed:
-
-```markdown
-Every commit message follows Conventional Commits. The file defines the allowed types and their SemVer impact and the rules for scope, description, body, footers and breaking changes.
-```
-
-- **Draw diagrams with [Mermaid](https://mermaid.js.org/)**, never with ASCII art in `text` blocks. This applies to flowcharts, sequence diagrams, layer and component diagrams, state machines, class and entity-relationship diagrams, mind maps, timelines and any other chart. GitHub and VS Code (through the recommended `bierner.github-markdown-preview` extension pack) render Mermaid as a real diagram for human readers, and its declarative syntax states nodes and relationships explicitly, which LLMs read far more reliably than box-drawing characters. Browse the [Mermaid syntax reference](https://mermaid.js.org/syntax/) to pick the diagram type that best fits the content.
-- **Draw directory trees with Mermaid's [`treeView-beta`](https://mermaid.js.org/syntax/treeView.html) diagram.** It doesn't require the box-drawing tree (`├──`, `└──`, `│`) and descriptions follow the label after `##`. Command lines and commit message samples are not diagrams and stay in `text` blocks.
-
-❌ Undesirable:
-
-````markdown
-```text
-┌────────────┐      ┌─────────────┐      ┌────────┐
-│  adapters  │ ───► │ application │ ───► │ domain │
-└────────────┘      └─────────────┘      └────────┘
-```
-````
-
-✅ Fixed:
-
-````markdown
-```mermaid
-flowchart LR
-    adapters --> application --> domain
-```
-````
-
-❌ Undesirable:
-
-````markdown
-```text
-tests/
-├── unit/ # Fast, isolated tests without I/O
-└── e2e/  # Critical user journeys
-```
-````
-
-✅ Fixed:
-
-````markdown
-```mermaid
-treeView-beta
-tests/
-    unit/ ## Fast, isolated tests without I/O
-    e2e/ ## Critical user journeys
-```
-````
 
 ## Clean Code
 

@@ -42,9 +42,15 @@ Dependencies and environments are managed **exclusively with [uv](https://docs.a
 
 ## Code standards
 
-**Before writing or reviewing any code, read and follow [`code-standards`](.agents/rules/code-standards.md).** It defines the code conventions (object-oriented programming as the predominant paradigm, one class per `.py` file even for small classes, with related classes grouped in a folder named after their family instead of sharing a file, Python 3.13+ syntax, mandatory type annotations, Google-style docstrings, Ruff rules), the Markdown conventions (never hard-wrap paragraphs: write each one on a single line and let the editor soft-wrap it; draw diagrams, flowcharts, mind maps and directory trees with Mermaid instead of ASCII art) and the Clean Code rules, with undesirable and fixed examples: no magic numbers, intention-revealing names, small functions, guard clauses (early return), no `break`/`continue` or tautologies such as `while True`, object-oriented programming as the predominant paradigm, specific exceptions, DRY, meaningful comments and one class per file grouped in family folders.
+**Before writing or reviewing any code, read and follow [`code-standards`](.agents/rules/code-standards.md).** It defines the code conventions (object-oriented programming as the predominant paradigm, one class per `.py` file even for small classes, with related classes grouped in a folder named after their family instead of sharing a file, Python 3.13+ syntax, mandatory type annotations, Google-style docstrings, Ruff rules) and the Clean Code rules, with undesirable and fixed examples: no magic numbers, intention-revealing names, small functions, guard clauses (early return), no `break`/`continue` or tautologies such as `while True`, object-oriented programming as the predominant paradigm, specific exceptions, DRY, meaningful comments and one class per file grouped in family folders.
 
 @.agents/rules/code-standards.md
+
+## Markdown standards
+
+**Before writing or reviewing any Markdown file, read and follow [`markdown-standards`](.agents/rules/markdown-standards.md).** It defines the Markdown conventions, with undesirable and fixed examples: never hard-wrap paragraphs (write each one on a single line and let the editor soft-wrap it), draw diagrams, flowcharts and mind maps with Mermaid instead of ASCII art, and draw directory trees with Mermaid's `treeView-beta` diagram.
+
+@.agents/rules/markdown-standards.md
 
 ## Architecture
 
@@ -82,7 +88,7 @@ Dependencies and environments are managed **exclusively with [uv](https://docs.a
 2. `uv run poe check` passes (Ruff lint, Ruff formatting and ty type checks).
 3. The changed behavior is covered by tests following [`.agents/rules/tests.md`](.agents/rules/tests.md), and
    `uv run poe test` passes with at least 80% coverage.
-4. The rules in `.agents/rules/code-standards.md` and, for changes inside `src/`, the `architecture-standards` skill
+4. The rules in `.agents/rules/code-standards.md`, `.agents/rules/markdown-standards.md` (for Markdown files) and, for changes inside `src/`, the `architecture-standards` skill
    (Dependency Rule and SOLID principles) are respected.
 5. Logs are emitted as wide events with structlog and persisted to `.jsonl` files in `logs/` (repository root,
    listed in `.gitignore`), following the `wide-event-logging` skill (including `timestamp`, `origin.file` and

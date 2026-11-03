@@ -210,6 +210,8 @@ The complete, annotated tree lives in [`.agents/rules/repo-structure.md`](.agent
 
 - **Code:** Python 3.13+ syntax, mandatory type annotations, Google-style docstrings and Clean Code rules
   ([`code-standards.md`](.agents/rules/code-standards.md)).
+- **Markdown:** no hard-wrapped paragraphs, diagrams and directory trees drawn with Mermaid
+  ([`markdown-standards.md`](.agents/rules/markdown-standards.md)).
 - **Architecture:** Clean Architecture, Ports and Adapters, Domain-Driven Design and SOLID
   ([`architecture-standards`](.agents/skills/architecture-standards/SKILL.md)).
 - **Tests:** Pytest, at least 80% coverage, FIRST principles, Arrange/Act/Assert and the test pyramid
