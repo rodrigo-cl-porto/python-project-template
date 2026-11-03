@@ -1,3 +1,11 @@
+---
+name: code-standards
+description: Code conventions, Markdown conventions and Clean Code rules of this repository (object-oriented programming, one class per file grouped in family folders, Python 3.13+ syntax, mandatory type annotations, Google-style docstrings, Ruff rules, no magic numbers, small functions, guard clauses, no comments, Mermaid diagrams, no hard-wrapped Markdown). Read before writing or reviewing any Python code or Markdown file.
+paths:
+  - "**/*.py"
+  - "**/*.md"
+---
+
 # Code Standards
 
 Coding conventions and Clean Code rules for this repository. They complement [`AGENTS.md`](../../AGENTS.md), and every agent must follow them when writing or reviewing Python code.

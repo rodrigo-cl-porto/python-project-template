@@ -1,3 +1,11 @@
+---
+name: dev-environment
+description: Development environment of this repository, with dependencies managed exclusively by uv (never pip, requirements.txt, poetry or conda), the dependency groups, the development tools (Ruff, ty, Pytest, pytest-cov, Playwright, structlog, Poe the Poet, Zensical) and the Poe the Poet tasks. Read before installing, adding, removing or upgrading dependencies, or running the development tools.
+paths:
+  - "uv.lock"
+  - "*.toml"
+---
+
 # Development Environment
 
 Development environment setup of this repository: dependency management with uv, the development tools and the Poe the Poet tasks. It complements [`AGENTS.md`](../../AGENTS.md), and every agent must follow it when installing, adding, removing or upgrading dependencies, and when running the development tools.

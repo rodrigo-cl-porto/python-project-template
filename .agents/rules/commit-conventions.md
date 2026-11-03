@@ -1,3 +1,8 @@
+---
+name: commit-conventions
+description: Commit message conventions of this repository, following Conventional Commits 1.0.0 (allowed types and their SemVer impact, scope, description, body, footers and breaking changes). Read before writing or reviewing any commit message.
+---
+
 # Commit Conventions
 
 Commit message conventions of this repository. They complement [`AGENTS.md`](../../AGENTS.md), and every agent must follow them when writing or reviewing commit messages.

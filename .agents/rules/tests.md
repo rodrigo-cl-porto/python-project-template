@@ -1,3 +1,11 @@
+---
+name: tests
+description: Testing rules of this repository (mandatory Pytest tests, at least 80% coverage, focus on critical behaviors, FIRST principles, Arrange/Act/Assert and the test pyramid split into tests/unit/, tests/integration/ and tests/e2e/). Read before writing or reviewing any code or test.
+paths:
+  - "src/**/*.py"
+  - "tests/**/*.py"
+---
+
 # Testing Rules
 
 Rules for writing automated tests in this repository. They complement [`AGENTS.md`](../../AGENTS.md) and [`code-standards.md`](code-standards.md), and every agent must follow them when writing or reviewing code.

@@ -1,3 +1,8 @@
+---
+name: repo-structure
+description: Folder and file layout of this repository and the role of each folder (src/, tests/, docs/, .agents/, .claude/ and the root *.toml files). Read before creating, moving, renaming or reviewing any file or folder, and keep it up to date whenever the structure changes.
+---
+
 # Repository Structure
 
 Folder and file layout of this repository. It complements [`AGENTS.md`](../../AGENTS.md), and every agent must follow it when creating, moving or reviewing files. Keep this tree up to date whenever files or folders are added, renamed or removed.
