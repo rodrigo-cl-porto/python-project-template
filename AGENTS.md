@@ -32,25 +32,17 @@ This repository is a **template for Python projects**. It is the starting point 
 
 **Before creating, moving or renaming any file or folder, read and follow [`repo-structure`](.agents/rules/repo-structure.md).** It defines the folder and file layout of the repository and the role of each folder (`src/`, `tests/`, `docs/`, `.agents/rules/` and the root `*.toml` files). Keep it up to date whenever the structure changes.
 
-@.agents/rules/repo-structure.md
-
 ## Development environment
 
 Dependencies and environments are managed **exclusively with [uv](https://docs.astral.sh/uv/)**; **never** use `pip`, `requirements.txt`, `poetry` or `conda`. **Before installing, adding, removing or upgrading dependencies, or running the development tools, read and follow [`.agents/rules/dev-environment.md`](.agents/rules/dev-environment.md).** It defines the uv commands and dependency groups, the development tools (Ruff, ty, Pytest, pytest-cov, Playwright, structlog, Poe the Poet, Zensical) and the Poe the Poet tasks (`uv run poe <task>`).
-
-@.agents/rules/dev-environment.md
 
 ## Code standards
 
 **Before writing or reviewing any code, read and follow [`code-standards`](.agents/rules/code-standards.md).** It defines the code conventions (object-oriented programming as the predominant paradigm, one class per `.py` file even for small classes, with related classes grouped in a folder named after their family instead of sharing a file, Python 3.13+ syntax, mandatory type annotations, Google-style docstrings, Ruff rules) and the Clean Code rules, with undesirable and fixed examples: no magic numbers, intention-revealing names, small functions, guard clauses (early return), no `break`/`continue` or tautologies such as `while True`, object-oriented programming as the predominant paradigm, specific exceptions, DRY, meaningful comments and one class per file grouped in family folders.
 
-@.agents/rules/code-standards.md
-
 ## Markdown standards
 
 **Before writing or reviewing any Markdown file, read and follow [`markdown-standards`](.agents/rules/markdown-standards.md).** It defines the Markdown conventions, with undesirable and fixed examples: never hard-wrap paragraphs (write each one on a single line and let the editor soft-wrap it), draw diagrams, flowcharts and mind maps with Mermaid instead of ASCII art, and draw directory trees with Mermaid's `treeView-beta` diagram.
-
-@.agents/rules/markdown-standards.md
 
 ## Architecture
 
@@ -60,8 +52,6 @@ Dependencies and environments are managed **exclusively with [uv](https://docs.a
 
 **Every piece of code must be covered by automated tests, with at least 80% coverage. This rule is CRITICAL.** Before writing or reviewing any test, read and follow [`.agents/rules/tests.md`](.agents/rules/tests.md). It defines the  testing rules, with undesirable and fixed examples: mandatory Pytest tests, minimum coverage, focus on critical behaviors, the FIRST principles (Fast, Independent, Repeatable, Self-validating, Timely), the Arrange/Act/Assert structure and the test pyramid split into `tests/unit/`, `tests/integration/` and `tests/e2e/`.
 
-@.agents/rules/tests.md
-
 ## Logging: wide events with structlog
 
 **Before writing or reviewing any code that emits logs, use the [`wide-event-logging`](.agents/skills/wide-event-logging/SKILL.md) skill.** Use it whenever the application must record an event it generates (request, CLI command, job, use case) or receives or may run into an external event (webhook, queue message, scheduled trigger, calls to or failures of external services). Logs follow the **wide events** (canonical log lines) convention proposed by **[Logging Sucks](https://loggingsucks.com/)**: one structured JSON event per unit of work, emitted once at the end with **structlog** and always persisted to a **`.jsonl`** file in the **`logs/`** folder at the repository root (ignored by Git), always including the execution date and time (`timestamp`), the file and the method or function where the main event occurred (`origin.file` and `origin.function`), and tail sampling to decide which events to keep.
@@ -70,13 +60,9 @@ Dependencies and environments are managed **exclusively with [uv](https://docs.a
 
 **Before writing any commit message, read and follow [`.agents/rules/commit-conventions.md`](.agents/rules/commit-conventions.md).** Every commit message follows **[Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/)** (`<type>[optional scope][!]: <description>`). The file defines the allowed types and their SemVer impact and the rules for scope, description, body, footers and breaking changes, with examples.
 
-@.agents/rules/commit-conventions.md
-
 ## Versioning: Semantic Versioning
 
 **Before bumping or reading the version of the solution, read and follow [`.agents/rules/versioning.md`](.agents/rules/versioning.md).** The version follows **[Semantic Versioning 2.0.0](https://semver.org/)** (`MAJOR.MINOR.PATCH`), its single source of truth is the `version` field in `pyproject.toml`, and it is bumped only with `uv version --bump <part>`. The file defines when to bump each part, pre-releases, build metadata and how to derive the bump from the Conventional Commits.
-
-@.agents/rules/versioning.md
 
 ## Changelog: Keep a Changelog
 

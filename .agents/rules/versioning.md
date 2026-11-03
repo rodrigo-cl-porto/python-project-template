@@ -3,6 +3,7 @@ name: versioning
 description: Versioning conventions of this repository, following Semantic Versioning 2.0.0, with the version field in pyproject.toml as the single source of truth, bumped only with uv version --bump. Read before bumping or reading the version of the solution.
 paths:
   - "pyproject.toml"
+alwaysApply: false
 ---
 
 # Versioning

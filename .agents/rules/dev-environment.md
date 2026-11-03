@@ -4,6 +4,7 @@ description: Development environment of this repository, with dependencies manag
 paths:
   - "uv.lock"
   - "*.toml"
+alwaysApply: false
 ---
 
 # Development Environment

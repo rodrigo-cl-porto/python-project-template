@@ -4,6 +4,7 @@ description: Testing rules of this repository (mandatory Pytest tests, at least 
 paths:
   - "src/**/*.py"
   - "tests/**/*.py"
+alwaysApply: false
 ---
 
 # Testing Rules

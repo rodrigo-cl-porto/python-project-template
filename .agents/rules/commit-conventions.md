@@ -1,6 +1,7 @@
 ---
 name: commit-conventions
 description: Commit message conventions of this repository, following Conventional Commits 1.0.0 (allowed types and their SemVer impact, scope, description, body, footers and breaking changes). Read before writing or reviewing any commit message.
+alwaysApply: false
 ---
 
 # Commit Conventions

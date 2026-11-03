@@ -3,6 +3,7 @@ name: markdown-standards
 description: Markdown conventions of this repository (never hard-wrap paragraphs, draw diagrams with Mermaid instead of ASCII art and directory trees with Mermaid's treeView-beta diagram). Read before writing or reviewing any Markdown file, including AGENTS.md, README.md, CHANGELOG.md, docs/, rules and skills.
 paths:
   - "**/*.md"
+alwaysApply: false
 ---
 
 # Markdown Standards
